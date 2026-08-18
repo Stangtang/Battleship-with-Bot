@@ -87,7 +87,7 @@ void print_options(const std::vector<std::string>& options) {
 std::uint8_t get_option_selected(const std::vector<std::string>& options) {
     int key_pressed;
     do {
-        key_pressed = _getch();
+        key_pressed = get_keystroke();
     } while (!is_option_selection_input_valid(key_pressed, options.size()));
 
     const char key_pressed_char = static_cast<char>(key_pressed);
@@ -102,7 +102,7 @@ std::uint8_t print_options_and_get_option_selected(const std::vector<std::string
     
         print_options(options);
 
-        key_pressed = _getch();
+        key_pressed = get_keystroke();
     } while (!is_option_selection_input_valid(key_pressed, options.size()));
 
     const char key_pressed_char = static_cast<char>(key_pressed);
