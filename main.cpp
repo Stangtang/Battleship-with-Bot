@@ -26,10 +26,10 @@ enum Menu {
 };
 
 std::stack<Menu> menu;
-Cell_State player_1_self_view_grid[BOARD_LENGTH][BOARD_LENGTH] = {};
-Cell_State player_1_opp_view_grid[BOARD_LENGTH][BOARD_LENGTH] = {};
-Cell_State player_2_self_view_grid[BOARD_LENGTH][BOARD_LENGTH] = {};
-Cell_State player_2_opp_view_grid[BOARD_LENGTH][BOARD_LENGTH] = {};
+Cell_State player_1_defending_board[BOARD_LENGTH][BOARD_LENGTH] = {};
+Cell_State player_2_defending_board[BOARD_LENGTH][BOARD_LENGTH] = {};
+Cell_State player_1_attacking_board[BOARD_LENGTH][BOARD_LENGTH] = {};
+Cell_State player_2_attacking_board[BOARD_LENGTH][BOARD_LENGTH] = {};
 
 void clear_terminal()
 {
@@ -68,7 +68,7 @@ void clear_terminal()
     }
 #endif
 
-enum Key {
+enum Special_Key {
     Not_Recognized,
     Enter,
     Up_Arrow,
@@ -81,34 +81,34 @@ enum Key {
 #ifdef _WIN32
     #include <conio.h>
 
-    Key get_special_key() {
+    Special_Key get_special_keystroke() {
         int ch = _getch();
 
         if (ch == '\r') {
-            return Key::Enter;
+            return Special_Key::Enter;
         }
 
         if (ch == 'r' || ch == 'R') {
-            return Key::R;
+            return Special_Key::R;
         }
 
         if (ch == 0 || ch == 224) {
             switch (_getch()) {
-                case 72: return Key::Up_Arrow;
-                case 80: return Key::Down_Arrow;
-                case 75: return Key::Left_Arrow;
-                case 77: return Key::Right_Arrow;
+                case 72: return Special_Key::Up_Arrow;
+                case 80: return Special_Key::Down_Arrow;
+                case 75: return Special_Key::Left_Arrow;
+                case 77: return Special_Key::Right_Arrow;
             }
         }
 
-        return Key::Not_Recognized;
+        return Special_Key::Not_Recognized;
     }
 #else
     #include <termios.h>
     #include <unistd.h>
     #include <cstdio>
 
-    Key get_special_key() {
+    Key get_special_keystroke() {
         termios oldt, newt;
 
         tcgetattr(STDIN_FILENO, &oldt);
@@ -119,19 +119,19 @@ enum Key {
 
         int ch = getchar();
 
-        Key result = Key::Not_Recognized;
+        Key result = Special_Key::Not_Recognized;
 
         if (ch == '\n' || ch == '\r') {
-            result = Key::Enter;
+            result = Special_Key::Enter;
         } else if (ch == 'r' || ch == 'R') {
-            result = Key::R; 
+            result = Special_Key::R; 
         } else if (ch == 27) { // ESC sequence
             if (getchar() == '[') {
                 switch (getchar()) {
-                    case 'A': result = Key::Up_Arrow;    break;
-                    case 'B': result = Key::Down_Arrow;  break;
-                    case 'C': result = Key::Right_Arrow; break;
-                    case 'D': result = Key::Left_Arrow;  break;
+                    case 'A': result = Special_Key::Up_Arrow;    break;
+                    case 'B': result = Special_Key::Down_Arrow;  break;
+                    case 'C': result = Special_Key::Right_Arrow; break;
+                    case 'D': result = Special_Key::Left_Arrow;  break;
                 }
             }
         }
@@ -229,14 +229,22 @@ void print_board(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
     }
 }
 
-void place_ship(const Cell_State& ship_type) {
-    Key input;
+void place_ship(const Cell_State& ship_type, const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+    Special_Key input;
     do {
         clear_terminal();
         
         std::cout << "USE ARROW KEYS TO CHANGE POSITION OF SHIP\n";
+        std::cout << "USE R TO ROTATE SHIP\n";
+        std::cout << "PRESS ENTER TO CONFIRM\n";
+        std::cout << '\n';
+        
+        print_board(board);
 
-    } while(true); // change inf loop when done
+        input = get_special_keystroke();
+
+    } while(input != Special_Key::Enter); // temp exit condition for now, may need to change this
+
 }
 
 void handle_play_against_human() {
@@ -254,10 +262,10 @@ void handle_play_against_human() {
     
     print_options(options);
     std::cout << '\n';
-    print_board(player_1_self_view_grid);
+    print_board(player_1_defending_board);
     switch(get_option_selected(options)) {
         case 1:
-            place_ship(Cell_State::Aircraft_Carrier);
+            place_ship(Cell_State::Aircraft_Carrier, player_1_defending_board);
             break;
         case 2:
             break;
@@ -268,7 +276,7 @@ void handle_play_against_human() {
         case 5:
             break;
         case 6:
-            player_1_self_view_grid[BOARD_LENGTH][BOARD_LENGTH] = {};
+            player_1_defending_board[BOARD_LENGTH][BOARD_LENGTH] = {};
             menu.pop();
             break;
     }

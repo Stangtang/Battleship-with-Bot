@@ -37,7 +37,7 @@ void clear_terminal()
     }
 #endif
 
-enum Key {
+enum Special_Key {
     Not_Recognized,
     Enter,
     Up_Arrow,
@@ -50,34 +50,34 @@ enum Key {
 #ifdef _WIN32
     #include <conio.h>
 
-    Key get_special_key() {
+    Special_Key get_special_keystroke() {
         int ch = _getch();
 
         if (ch == '\r') {
-            return Key::Enter;
+            return Special_Key::Enter;
         }
 
         if (ch == 'r' || ch == 'R') {
-            return Key::R;
+            return Special_Key::R;
         }
 
         if (ch == 0 || ch == 224) {
             switch (_getch()) {
-                case 72: return Key::Up_Arrow;
-                case 80: return Key::Down_Arrow;
-                case 75: return Key::Left_Arrow;
-                case 77: return Key::Right_Arrow;
+                case 72: return Special_Key::Up_Arrow;
+                case 80: return Special_Key::Down_Arrow;
+                case 75: return Special_Key::Left_Arrow;
+                case 77: return Special_Key::Right_Arrow;
             }
         }
 
-        return Key::Not_Recognized;
+        return Special_Key::Not_Recognized;
     }
 #else
     #include <termios.h>
     #include <unistd.h>
     #include <cstdio>
 
-    Key get_special_key() {
+    Key get_special_keystroke() {
         termios oldt, newt;
 
         tcgetattr(STDIN_FILENO, &oldt);
@@ -88,19 +88,19 @@ enum Key {
 
         int ch = getchar();
 
-        Key result = Key::Not_Recognized;
+        Key result = Special_Key::Not_Recognized;
 
         if (ch == '\n' || ch == '\r') {
-            result = Key::Enter;
+            result = Special_Key::Enter;
         } else if (ch == 'r' || ch == 'R') {
-            result = Key::R; 
+            result = Special_Key::R; 
         } else if (ch == 27) { // ESC sequence
             if (getchar() == '[') {
                 switch (getchar()) {
-                    case 'A': result = Key::Up_Arrow;    break;
-                    case 'B': result = Key::Down_Arrow;  break;
-                    case 'C': result = Key::Right_Arrow; break;
-                    case 'D': result = Key::Left_Arrow;  break;
+                    case 'A': result = Special_Key::Up_Arrow;    break;
+                    case 'B': result = Special_Key::Down_Arrow;  break;
+                    case 'C': result = Special_Key::Right_Arrow; break;
+                    case 'D': result = Special_Key::Left_Arrow;  break;
                 }
             }
         }
@@ -113,13 +113,13 @@ enum Key {
 
 int main() {
     while (true) {
-        switch(get_special_key()) {
-            case Key::Enter:       std::cout << "ENTER KEY PRESSED!!\n";   break;
-            case Key::Up_Arrow:    std::cout << "UP ARROW PRESSED!!\n";    break;
-            case Key::Down_Arrow:  std::cout << "DOWN ARROW PRESSED!!\n";  break;
-            case Key::Right_Arrow: std::cout << "RIGHT ARROW PRESSED!!\n"; break;
-            case Key::Left_Arrow:  std::cout << "LEFT ARROW PRESSED!!\n";  break;
-            case Key::R:           std::cout << "R PRESSED!!\n";           break;
+        switch(get_special_keystroke()) {
+            case Special_Key::Enter:       std::cout << "ENTER KEY PRESSED!!\n";   break;
+            case Special_Key::Up_Arrow:    std::cout << "UP ARROW PRESSED!!\n";    break;
+            case Special_Key::Down_Arrow:  std::cout << "DOWN ARROW PRESSED!!\n";  break;
+            case Special_Key::Right_Arrow: std::cout << "RIGHT ARROW PRESSED!!\n"; break;
+            case Special_Key::Left_Arrow:  std::cout << "LEFT ARROW PRESSED!!\n";  break;
+            case Special_Key::R:           std::cout << "R PRESSED!!\n";           break;
         }
     }
 }
