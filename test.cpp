@@ -94,7 +94,7 @@ enum Special_Key {
 
         int ch = getchar();
 
-        Special_Key result = Special_Key::Unknown;
+        Special_Key result = Special_Key::Not_Recognized;
 
         if (ch == '\n' || ch == '\r') {
             result = Special_Key::Enter;
@@ -114,10 +114,10 @@ enum Special_Key {
             } else {
                 if (getchar() == '[') {
                     switch (getchar()) {
-                        case 'A': result = Special_Key::Up;    break;
-                        case 'B': result = Special_Key::Down;  break;
-                        case 'C': result = Special_Key::Right; break;
-                        case 'D': result = Special_Key::Left;  break;
+                        case 'A': result = Special_Key::Up_Arrow;    break;
+                        case 'B': result = Special_Key::Down_Arrow;  break;
+                        case 'C': result = Special_Key::Right_Arrow; break;
+                        case 'D': result = Special_Key::Left_Arrow;  break;
                     }
                 }
             }
