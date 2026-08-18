@@ -41,29 +41,25 @@ void clear_terminal()
 #ifdef _WIN32
     #include <conio.h>
 
-    int get_keystroke()
-    {
+    int get_keystroke() {
         return _getch();
     }
 #else
     #include <termios.h>
     #include <unistd.h>
 
-    int get_keystroke()
-    {
+    int get_keystroke() {
         struct termios oldt, newt;
         int ch;
 
         tcgetattr(STDIN_FILENO, &oldt);
         newt = oldt;
 
-        /* Disable canonical mode and echo */
         newt.c_lflag &= ~(ICANON | ECHO);
         tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
         ch = getchar();
 
-        /* Restore terminal settings */
         tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 
         return ch;
