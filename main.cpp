@@ -1,8 +1,8 @@
+#include <cstdint>
+#include <cstdlib>
 #include <iostream>
 #include <stack>
 #include <vector>
-#include <cstdint>
-#include <cstdlib>
 
 #define BOARD_LENGTH 10
 
