@@ -45,6 +45,7 @@ enum Special_Key {
     Left_Arrow,
     Right_Arrow,
     R,
+    Escape,
 };
 
 #ifdef _WIN32
@@ -70,14 +71,19 @@ enum Special_Key {
             }
         }
 
+        if (ch == 27) {
+            return Special_Key::Escape;
+        }
+
         return Special_Key::Not_Recognized;
     }
 #else
     #include <termios.h>
     #include <unistd.h>
     #include <cstdio>
+    #include <sys/select.h>
 
-    Key get_special_keystroke() {
+    Special_Key get_special_keystroke() {
         termios oldt, newt;
 
         tcgetattr(STDIN_FILENO, &oldt);
@@ -88,19 +94,31 @@ enum Special_Key {
 
         int ch = getchar();
 
-        Key result = Special_Key::Not_Recognized;
+        Special_Key result = Special_Key::Unknown;
 
         if (ch == '\n' || ch == '\r') {
             result = Special_Key::Enter;
         } else if (ch == 'r' || ch == 'R') {
-            result = Special_Key::R; 
-        } else if (ch == 27) { // ESC sequence
-            if (getchar() == '[') {
-                switch (getchar()) {
-                    case 'A': result = Special_Key::Up_Arrow;    break;
-                    case 'B': result = Special_Key::Down_Arrow;  break;
-                    case 'C': result = Special_Key::Right_Arrow; break;
-                    case 'D': result = Special_Key::Left_Arrow;  break;
+            result = Special_Key::R;
+        } else if (ch == 27) { // Escape sequence
+            fd_set set;
+            FD_ZERO(&set);
+            FD_SET(STDIN_FILENO, &set);
+
+            timeval timeout{};
+            timeout.tv_sec = 0;
+            timeout.tv_usec = 0;
+
+            if (select(STDIN_FILENO + 1, &set, nullptr, nullptr, &timeout) == 0) {
+                result = Special_Key::Escape;
+            } else {
+                if (getchar() == '[') {
+                    switch (getchar()) {
+                        case 'A': result = Special_Key::Up;    break;
+                        case 'B': result = Special_Key::Down;  break;
+                        case 'C': result = Special_Key::Right; break;
+                        case 'D': result = Special_Key::Left;  break;
+                    }
                 }
             }
         }
@@ -120,6 +138,7 @@ int main() {
             case Special_Key::Right_Arrow: std::cout << "RIGHT ARROW PRESSED!!\n"; break;
             case Special_Key::Left_Arrow:  std::cout << "LEFT ARROW PRESSED!!\n";  break;
             case Special_Key::R:           std::cout << "R PRESSED!!\n";           break;
+            case Special_Key::Escape:      std::cout << "ESCAPE PRESSED!!\n";      break;
         }
     }
 }
