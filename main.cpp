@@ -1,6 +1,8 @@
+#include <algorithm>
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <random>
 #include <stack>
 #include <vector>
 
@@ -23,7 +25,7 @@ enum Menu {
     Play_Against_Human,
 };
 
-std::stack<Menu> curr_menu;
+std::stack<Menu> menu;
 Cell_State player_1_self_view_grid[BOARD_LENGTH][BOARD_LENGTH] = {};
 Cell_State player_1_opp_view_grid[BOARD_LENGTH][BOARD_LENGTH] = {};
 Cell_State player_2_self_view_grid[BOARD_LENGTH][BOARD_LENGTH] = {};
@@ -66,6 +68,15 @@ void clear_terminal()
     }
 #endif
 
+int get_random_number_inclusive(const int& bound_1, const int& bound_2) {
+    std::random_device rd;
+    const int lower_bound = std::min(bound_1, bound_2);
+    const int upper_bound = std::max(bound_1, bound_2);
+    std::uniform_int_distribution<int> dist(lower_bound, upper_bound);
+    const int random_number = dist(rd);
+    return random_number;
+}
+
 bool is_option_selection_input_valid(int key_pressed, std::uint8_t num_options) {
     const char key_pressed_char = static_cast<char>(key_pressed);
     if ('1' <= key_pressed_char && key_pressed_char <= '1' + num_options - 1) {
@@ -91,29 +102,15 @@ std::uint8_t get_option_selected(const std::vector<std::string>& options) {
     return (key_pressed_char - '1' + 1);
 }
 
-std::uint8_t print_options_and_get_option_selected(const std::vector<std::string>& options) {
-    int key_pressed;
-    do {
-        clear_terminal();
-    
-        print_options(options);
-
-        key_pressed = get_keystroke();
-    } while (!is_option_selection_input_valid(key_pressed, options.size()));
-
-    const char key_pressed_char = static_cast<char>(key_pressed);
-
-    return (key_pressed_char - '1' + 1);
-}
-
-void handle_start(std::stack<Menu>& menu) {
+void handle_start() {
     std::cout << "PRESS NUMBER KEY TO MAKE SELECTION\n";
 
     const std::vector<std::string> options = {
         "Play against bot",
         "Play against another human"
     };
-    switch(print_options_and_get_option_selected(options)) {
+    print_options(options);
+    switch(get_option_selected(options)) {
     case 1:
         menu.push(Menu::Play_Against_Bot);
         break;
@@ -158,16 +155,22 @@ void print_board(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
     }
 }
 
-void handle_play_against_human(std::stack<Menu>& menu) {
+void place_ship(const Cell_State& ship_type) {
+    do {
+
+    } while(true); // change inf loop when done
+}
+
+void handle_play_against_human() {
     std::cout << "PLAYER 1, CHOOSE YOUR SHIP LAYOUT\n";
     std::cout << '\n';
 
-    const std::vector<std::string> options = {
+    const std::vector<std::string> options = { // There is a better way to align the strings but this will do
         "Place Aircraft Carrier (Length 5)",
-        "Place Battleship (Length 4)",
-        "Place Cruiser (Length 3)",
-        "Place Submarine (Length 3)",
-        "Place Destroyer (Length 2)",
+        "Place Battleship       (Length 4)",
+        "Place Cruiser          (Length 3)",
+        "Place Submarine        (Length 3)",
+        "Place Destroyer        (Length 2)",
         "Back"
     };
     
@@ -176,6 +179,7 @@ void handle_play_against_human(std::stack<Menu>& menu) {
     print_board(player_1_self_view_grid);
     switch(get_option_selected(options)) {
         case 1:
+            place_ship(Cell_State::Aircraft_Carrier);
             break;
         case 2:
             break;
@@ -186,29 +190,30 @@ void handle_play_against_human(std::stack<Menu>& menu) {
         case 5:
             break;
         case 6:
+            player_1_self_view_grid[BOARD_LENGTH][BOARD_LENGTH] = {};
             menu.pop();
             break;
     }
 }
 
-void handle_menu(std::stack<Menu>& menu) {
+void handle_menu() {
     clear_terminal();
 
     switch(menu.top()) {
     case Menu::Start:
-        handle_start(menu);
+        handle_start();
         break;
     case Menu::Play_Against_Human:
-        handle_play_against_human(menu);
+        handle_play_against_human();
     }
 }
 
 int main() {
-    curr_menu.push(Menu::Start);
+    menu.push(Menu::Start);
 
     clear_terminal();
     while(true) {
-        handle_menu(curr_menu);
+        handle_menu();
         // check win? -- act no that will prolly happen somewhere else
     }
 }
