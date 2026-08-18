@@ -137,19 +137,19 @@ void print_board(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
                 std::cout << 'X';
                 break;
             case Cell_State::Aircraft_Carrier: // TODO: make ships display in diff colors 
-                std::cout << 'a';
+                std::cout << 'a'; //red
                 break;
             case Cell_State::Battleship:
-                std::cout << 'b';
+                std::cout << 'b'; //blue
                 break;
             case Cell_State::Cruiser:
-                std::cout << 'c';
+                std::cout << 'c'; //green
                 break;
             case Cell_State::Submarine:
-                std::cout << 's';
+                std::cout << 's'; //brown
                 break;
             case Cell_State::Destroyer:
-                std::cout << 'd';
+                std::cout << 'd'; //purple
                 break;
             }
             std::cout << ' ';
