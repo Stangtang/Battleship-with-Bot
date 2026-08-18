@@ -75,6 +75,7 @@ enum Key {
     Down_Arrow,
     Left_Arrow,
     Right_Arrow,
+    R,
 };
 
 #ifdef _WIN32
@@ -85,6 +86,10 @@ enum Key {
 
         if (ch == '\r') {
             return Key::Enter;
+        }
+
+        if (ch == 'r' || ch == 'R') {
+            return Key::R;
         }
 
         if (ch == 0 || ch == 224) {
@@ -118,8 +123,9 @@ enum Key {
 
         if (ch == '\n' || ch == '\r') {
             result = Key::Enter;
-        }
-        else if (ch == 27) { // ESC sequence
+        } else if (ch == 'r' || ch == 'R') {
+            result = Key::R; 
+        } else if (ch == 27) { // ESC sequence
             if (getchar() == '[') {
                 switch (getchar()) {
                     case 'A': result = Key::Up_Arrow;    break;
@@ -224,7 +230,11 @@ void print_board(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
 }
 
 void place_ship(const Cell_State& ship_type) {
+    Key input;
     do {
+        clear_terminal();
+        
+        std::cout << "USE ARROW KEYS TO CHANGE POSITION OF SHIP\n";
 
     } while(true); // change inf loop when done
 }

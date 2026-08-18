@@ -44,6 +44,7 @@ enum Key {
     Down_Arrow,
     Left_Arrow,
     Right_Arrow,
+    R,
 };
 
 #ifdef _WIN32
@@ -54,6 +55,10 @@ enum Key {
 
         if (ch == '\r') {
             return Key::Enter;
+        }
+
+        if (ch == 'r' || ch == 'R') {
+            return Key::R;
         }
 
         if (ch == 0 || ch == 224) {
@@ -87,8 +92,9 @@ enum Key {
 
         if (ch == '\n' || ch == '\r') {
             result = Key::Enter;
-        }
-        else if (ch == 27) { // ESC sequence
+        } else if (ch == 'r' || ch == 'R') {
+            result = Key::R; 
+        } else if (ch == 27) { // ESC sequence
             if (getchar() == '[') {
                 switch (getchar()) {
                     case 'A': result = Key::Up_Arrow;    break;
@@ -113,6 +119,7 @@ int main() {
             case Key::Down_Arrow:  std::cout << "DOWN ARROW PRESSED!!\n";  break;
             case Key::Right_Arrow: std::cout << "RIGHT ARROW PRESSED!!\n"; break;
             case Key::Left_Arrow:  std::cout << "LEFT ARROW PRESSED!!\n";  break;
+            case Key::R:           std::cout << "R PRESSED!!\n";           break;
         }
     }
 }
