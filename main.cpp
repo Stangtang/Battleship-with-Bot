@@ -651,6 +651,7 @@ void handle_play_against_human() {
                 get_keystroke();
             }
 
+            
             // do something
 
             break;
