@@ -1,6 +1,4 @@
 #include <algorithm>
-#include <cstdint>
-#include <cstdlib>
 #include <iostream>
 #include <random>
 #include <stack>
@@ -37,8 +35,10 @@ enum Cell_State {
 
 enum Menu {
     Start,
-    Play_Against_Bot,
     Play_Against_Human,
+    Player_1_Ship_Placement,
+    Player_2_Ship_Placement,
+    Play_Against_Bot,
 };
 
 std::stack<Menu> menu;
@@ -598,7 +598,7 @@ bool are_all_ships_placed(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH])
     return true;
 }
 
-void handle_play_against_human() {
+void handle_player_1_ship_placement() {
     std::cout << "PLAYER 1, CHOOSE YOUR SHIP LAYOUT\n";
     std::cout << '\n';
 
@@ -649,11 +649,10 @@ void handle_play_against_human() {
                 std::cout << ANSI_RED_BACKGROUND << "\nCANNOT CONFIRM LAYOUT: NOT ALL SHIPS PLACED" << ANSI_RESET << '\n';
                 std::cout << "Press any key to continue\n";
                 get_keystroke();
+                break;
             }
 
-            
-            // do something
-
+            menu.pop();
             break;
         case 8:
             init_board(player_1_defending_board);
@@ -662,17 +661,96 @@ void handle_play_against_human() {
     }
 }
 
+void handle_player_2_ship_placement() {
+    std::cout << "PLAYER 1 SHIP PLACEMENT CONFIRMED!\nPLAYER 2, CHOOSE YOUR SHIP LAYOUT\n";
+    std::cout << '\n';
+
+    const std::vector<std::string> options = { // There is a better way to align the strings but this will do
+        "Place \e[0;31mAircraft Carrier\e[0m (Length 5)",
+        "Place \e[0;36mBattleship\e[0m       (Length 4)",
+        "Place \e[0;32mCruiser\e[0m          (Length 3)",
+        "Place \e[0;33mSubmarine\e[0m        (Length 3)",
+        "Place \e[0;35mDestroyer\e[0m        (Length 2)",
+        "Reset Layout",
+        "Confirm Layout",
+        "Back",
+    };
+    print_options(options);
+    std::cout << '\n';
+
+    print_ship_color_legend();
+    std::cout << '\n';
+    
+    print_board(player_2_defending_board);
+
+    switch(get_option_selected(options)) {
+        case 1:
+            remove_ship(Aircraft_Carrier, player_2_defending_board);
+            place_ship(Aircraft_Carrier, player_2_defending_board);
+            break;
+        case 2:
+            remove_ship(Battleship, player_2_defending_board);
+            place_ship(Battleship, player_2_defending_board);
+            break;
+        case 3:
+            remove_ship(Cruiser, player_2_defending_board);
+            place_ship(Cruiser, player_2_defending_board);
+            break;
+        case 4:
+            remove_ship(Submarine, player_2_defending_board);
+            place_ship(Submarine, player_2_defending_board);
+            break;
+        case 5:
+            remove_ship(Destroyer, player_2_defending_board);
+            place_ship(Destroyer, player_2_defending_board);
+            break;
+        case 6:
+            init_board(player_2_defending_board);
+            break;
+        case 7: // confirm layout
+            if (!are_all_ships_placed(player_2_defending_board)) {
+                std::cout << ANSI_RED_BACKGROUND << "\nCANNOT CONFIRM LAYOUT: NOT ALL SHIPS PLACED" << ANSI_RESET << '\n';
+                std::cout << "Press any key to continue\n";
+                get_keystroke();
+                break;
+            }
+
+            menu.pop();
+            break;
+        case 8:
+            init_board(player_2_defending_board);
+            menu.pop();
+            break;
+    }
+}
+
+void handle_play_against_human() {
+    if (!are_all_ships_placed(player_1_defending_board)) {
+        menu.push(Menu::Player_1_Ship_Placement);
+    } else if (!are_all_ships_placed(player_2_defending_board)) {
+        menu.push(Menu::Player_2_Ship_Placement);
+    } else {
+        // ACTUALLY START THE GAME NOW I THINK
+    }
+}
+
 void handle_menu() {
     clear_terminal();
 
     switch(menu.top()) {
-    case Menu::Start:
+    case Start:
         handle_start();
         break;
-    case Menu::Play_Against_Human:
+    case Play_Against_Human:
         handle_play_against_human();
         break;
-    case Menu::Play_Against_Bot:
+    case Player_1_Ship_Placement:
+        handle_player_1_ship_placement();
+        break;
+    case Player_2_Ship_Placement:
+        handle_player_2_ship_placement();
+        break;
+    case Play_Against_Bot:
         // not implemented yet
         break;
     }
