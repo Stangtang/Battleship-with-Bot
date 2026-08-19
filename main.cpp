@@ -540,6 +540,35 @@ void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][B
     } while(input != Special_Key::Enter);
 }
 
+bool are_all_ships_placed(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+    const Cell_State ships[] = {
+        Aircraft_Carrier,
+        Battleship,
+        Cruiser,
+        Submarine,
+        Destroyer
+    };
+
+    for (Cell_State ship : ships) {
+        bool found = false;
+
+        for (size_t i = 0; i < BOARD_LENGTH && !found; i++) {
+            for (size_t j = 0; j < BOARD_LENGTH; j++) {
+                if (board[i][j] == ship) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!found) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void handle_play_against_human() {
     std::cout << "PLAYER 1, CHOOSE YOUR SHIP LAYOUT\n";
     std::cout << '\n';
@@ -551,6 +580,7 @@ void handle_play_against_human() {
         "Place Submarine        (Length 3)",
         "Place Destroyer        (Length 2)",
         "Reset Layout",
+        "Confirm Layout",
         "Back",
     };
     print_options(options);
@@ -582,7 +612,17 @@ void handle_play_against_human() {
         case 6:
             init_board(player_1_defending_board);
             break;
-        case 7:
+        case 7: // confirm layout
+            if (!are_all_ships_placed(player_1_defending_board)) {
+                std::cout << ANSI_RED_BACKGROUND << "\nCANNOT CONFIRM LAYOUT: NOT ALL SHIPS PLACED" << ANSI_RESET << '\n';
+                std::cout << "Press any key to continue\n";
+                get_keystroke();
+            }
+
+            // do something
+
+            break;
+        case 8:
             init_board(player_1_defending_board);
             menu.pop();
             break;
@@ -599,7 +639,8 @@ void handle_menu() {
     case Menu::Play_Against_Human:
         handle_play_against_human();
         break;
-    case Menu::Play_Against_Bot: 
+    case Menu::Play_Against_Bot:
+        // not implemented yet
         break;
     }
 }
