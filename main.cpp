@@ -542,8 +542,7 @@ void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][B
                 break;
         }
 
-    } while(input != Special_Key::Enter); // temp exit condition for now, may need to change this
-
+    } while(input != Special_Key::Enter);
 }
 
 void handle_play_against_human() {
