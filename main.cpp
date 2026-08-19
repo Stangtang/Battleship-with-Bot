@@ -112,7 +112,7 @@ void print_board(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
             case Cell_State::Hit:
                 std::cout << 'X';
                 break;
-            case Cell_State::Aircraft_Carrier: // TODO: make ships display in diff colors 
+            case Cell_State::Aircraft_Carrier:
                 std::cout << ANSI_RED_FOREGROUND << '#' << ANSI_RESET;
                 break;
             case Cell_State::Battleship:
@@ -134,10 +134,14 @@ void print_board(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
     }
 }
 
+bool is_position_in_bounds(const int& row, const int& col) {
+    return row >= 0 && row < BOARD_LENGTH && col >= 0 && col < BOARD_LENGTH;
+}
+
 bool are_cell_and_neighbors_unmarked(const int& row, const int& col, const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
     for (int i = row - 1; i <= row + 1; i++) {
         for (int j = col - 1; j <= col + 1; j++) {
-            if (i < 0 || i >= BOARD_LENGTH || j < 0 || j >= BOARD_LENGTH) {
+            if (is_position_in_bounds(row, col)) {
                 continue;
             }
             if (board[i][j] != Cell_State::Unmarked) {
@@ -166,11 +170,12 @@ void place_ship_randomly(const Cell_State& ship_type, Cell_State (&board)[BOARD_
     case Cell_State::Cruiser:          ship_length = 3; break;
     case Cell_State::Submarine:        ship_length = 3; break;
     case Cell_State::Destroyer:        ship_length = 2; break;
+    default: return;
     }
 
     while (true) { // there should be no case where there is no valid placement for a ship
         const unsigned int direction = get_random_number_inclusive(1, 2);
-        if (direction == 1) { // left -> right
+        if (direction == 1) { // horizontal
             const unsigned int row = get_random_number_inclusive(0, BOARD_LENGTH - 1);
             const unsigned int col = get_random_number_inclusive(0, BOARD_LENGTH - 1 - ship_length + 1);
 
@@ -190,7 +195,7 @@ void place_ship_randomly(const Cell_State& ship_type, Cell_State (&board)[BOARD_
             }
             
             break;
-        } else if (direction == 2) { // up -> down
+        } else if (direction == 2) { // vertical
             const unsigned int row = get_random_number_inclusive(0, BOARD_LENGTH - 1 - ship_length + 1);
             const unsigned int col = get_random_number_inclusive(0, BOARD_LENGTH - 1);
 
@@ -236,20 +241,20 @@ void move_ship(const int (&direction)[2], const Cell_State& ship_type, Cell_Stat
     const int delta_col = direction[1];
 
     bool can_move = true;
-    for (unsigned int row = 0; row < BOARD_LENGTH; row++) {
-        for (unsigned int col = 0; col < BOARD_LENGTH; col++) {
+    for (unsigned int row = 0; row < BOARD_LENGTH && can_move; row++) {
+        for (unsigned int col = 0; col < BOARD_LENGTH && can_move; col++) {
             if (board[row][col] == ship_type) {
                 const int new_row = row + delta_row;
                 const int new_col = col + delta_col;
 
-                if (new_row < 0 || new_row >= BOARD_LENGTH || new_col < 0 || new_col >= BOARD_LENGTH) {
+                if (!is_position_in_bounds(new_row, new_col)) {
                     can_move = false;
-                    continue;
+                    break;
                 }
 
                 if (board[new_row][new_col] != Cell_State::Unmarked && board[new_row][new_col] != ship_type) {
                     can_move = false;
-                    continue;
+                    break;
                 }
             }
         }
