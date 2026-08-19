@@ -54,7 +54,12 @@ void init_board(Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
 }
 
 void clear_terminal() {
-    std::cout << ANSI_CLEAR_TERMINAL;
+  std::cout << ANSI_CLEAR_TERMINAL;
+// #ifdef _WIN32
+//     std::system("cls");
+// #else
+//     std::system("clear");
+// #endif
 }
 
 int get_random_number_inclusive(const int& bound_1, const int& bound_2) {
