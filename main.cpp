@@ -536,6 +536,25 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
         }
     break;
     case Destroyer:
+        if (orientation == 0) {
+            if (center_row >= BOARD_LENGTH - 1) {
+                can_rotate = false;
+                break;
+            }
+            if (board[center_row + 1][center_col] != Unmarked) {
+                can_rotate = false;
+                break;
+            }
+        } else if (orientation == 1) {
+            if (center_col >= BOARD_LENGTH - 1) {
+                can_rotate = false;
+                break;
+            }
+            if (board[center_row][center_col + 1] != Unmarked) {
+                can_rotate = false;
+                break;
+            }
+        }
     break;
     }
 
