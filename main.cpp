@@ -163,10 +163,7 @@ bool is_position_in_bounds(const int& row, const int& col) {
 bool are_cell_and_neighbors_unmarked(const int& row, const int& col, const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
     for (int i = row - 1; i <= row + 1; i++) {
         for (int j = col - 1; j <= col + 1; j++) {
-            if (is_position_in_bounds(row, col)) {
-                continue;
-            }
-            if (board[i][j] != Cell_State::Unmarked) {
+            if (board[i][j] != Cell_State::Unmarked || !is_position_in_bounds(row, col)) {
                 return false;
             }
         }
