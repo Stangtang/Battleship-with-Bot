@@ -18,7 +18,6 @@
 
 // https://gist.github.com/RabaDabaDoba/145049536f815903c79944599c6f952a
 
-// Regular Foreground
 #define ANSI_BLACK_FOREGROUND   "\e[0;30m"
 #define ANSI_RED_FOREGROUND     "\e[0;31m"
 #define ANSI_GREEN_FOREGROUND   "\e[0;32m"
@@ -28,7 +27,6 @@
 #define ANSI_CYAN_FOREGROUND    "\e[0;36m"
 #define ANSI_WHITE_FOREGROUND   "\e[0;37m"
 
-// Bright Foreground
 #define ANSI_BRIGHT_BLACK_FOREGROUND    "\e[0;90m"
 #define ANSI_BRIGHT_RED_FOREGROUND      "\e[0;91m"
 #define ANSI_BRIGHT_GREEN_FOREGROUND    "\e[0;92m"
@@ -38,7 +36,6 @@
 #define ANSI_BRIGHT_CYAN_FOREGROUND     "\e[0;96m"
 #define ANSI_BRIGHT_WHITE_FOREGROUND    "\e[0;97m"
 
-// Regular Background
 #define ANSI_BLACK_BACKGROUND   "\e[40m"
 #define ANSI_RED_BACKGROUND     "\e[41m"
 #define ANSI_GREEN_BACKGROUND   "\e[42m"
@@ -48,7 +45,6 @@
 #define ANSI_CYAN_BACKGROUND    "\e[46m"
 #define ANSI_WHITE_BACKGROUND   "\e[47m"
 
-// Bright Background
 #define ANSI_BRIGHT_BLACK_BACKGROUND    "\e[100m" // ???
 #define ANSI_BRIGHT_RED_BACKGROUND      "\e[101m"
 #define ANSI_BRIGHT_GREEN_BACKGROUND    "\e[102m"
