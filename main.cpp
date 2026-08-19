@@ -343,7 +343,7 @@ std::string get_ship_name(const Cell_State& ship_type) {
         case Cell_State::Destroyer:
             return "Destroyer";
         default:
-            return "\033[34;43mERROR: NOT A SHIP NAME\033[0m";
+            return "\033[34;43mERROR: NOT A SHIP NAME\033[0m"; // This text should never show
     }
 }
 
