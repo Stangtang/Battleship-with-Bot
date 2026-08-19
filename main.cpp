@@ -22,11 +22,19 @@ enum Cell_State {
     Destroyer,
 };
 
+enum Player {
+    None,
+    Player_1,
+    Player_2,
+    Bot
+};
+
 enum Menu {
     Start,
     Play_Against_Human,
     Player_1_Ship_Placement,
     Player_2_Ship_Placement,
+    Player_Versus_Player_Game,
     Play_Against_Bot,
 };
 
@@ -38,6 +46,7 @@ Cell_State player_1_defending_board[BOARD_LENGTH][BOARD_LENGTH] = {};
 Cell_State player_2_defending_board[BOARD_LENGTH][BOARD_LENGTH] = {};
 Cell_State player_1_attacking_board[BOARD_LENGTH][BOARD_LENGTH] = {};
 Cell_State player_2_attacking_board[BOARD_LENGTH][BOARD_LENGTH] = {};
+Player curr_player = None;
 std::random_device main_rd;
 
 // SAVE FOR LATER
@@ -728,8 +737,12 @@ void handle_play_against_human() {
     } else if (!are_all_ships_placed(player_2_defending_board)) {
         menu.push(Menu::Player_2_Ship_Placement);
     } else {
-        // ACTUALLY START THE GAME NOW I THINK
+        menu.push(Menu::Player_Versus_Player_Game);
     }
+}
+
+void handle_player_versus_player_game() {
+
 }
 
 void handle_menu() {
@@ -747,6 +760,9 @@ void handle_menu() {
         break;
     case Player_2_Ship_Placement:
         handle_player_2_ship_placement();
+        break;
+    case Player_Versus_Player_Game:
+        handle_player_versus_player_game();
         break;
     case Play_Against_Bot:
         // not quite implemented yet
