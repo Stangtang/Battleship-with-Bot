@@ -4,10 +4,12 @@
 #include <iostream>
 #include <random>
 #include <stack>
+#include <utility>
 #include <vector>
 
 #define BOARD_LENGTH 10
 
+#define ANSI_RESET "\033[0m"
 #define ANSI_RED_BACKGROUND "\033[41m"
 #define ANSI_BRIGHTER_RED_BACKGROUND "\033[101m"
 
@@ -346,7 +348,54 @@ std::string get_ship_name(const Cell_State& ship_type) {
 }
 
 void move_ship(const int (&direction)[2], const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+    const int delta_row = direction[0];
+    const int delta_col = direction[1];
 
+    bool can_move = true;
+    for (unsigned int row = 0; row < BOARD_LENGTH; row++) {
+        for (unsigned int col = 0; col < BOARD_LENGTH; col++) {
+            if (board[row][col] == ship_type) {
+                const int new_row = row + delta_row;
+                const int new_col = col + delta_col;
+
+                if (new_row < 0 || new_row >= BOARD_LENGTH || new_col < 0 || new_col >= BOARD_LENGTH) {
+                    can_move = false;
+                    continue;
+                }
+
+                if (board[new_row][new_col] != Cell_State::Unmarked && board[new_row][new_col] != ship_type) {
+                    can_move = false;
+                }
+            }
+        }
+    }
+
+    if (!can_move) {
+        std::cout << ANSI_RED_BACKGROUND << "\nCANNOT MOVE THERE" << ANSI_RESET << '\n';
+        std::cout << "Press any key to continue\n";
+        get_keystroke();
+        return;
+    }
+
+    std::vector<std::pair<int, int>> ship_cells;
+    std::vector<std::pair<int, int>> ship_new_cells;
+    for (unsigned int row = 0; row < BOARD_LENGTH; row++) {
+        for (unsigned int col = 0; col < BOARD_LENGTH; col++) {
+            if (board[row][col] == ship_type) {
+                const int new_row = row + delta_row;
+                const int new_col = col + delta_col;
+
+                ship_cells.push_back(std::make_pair(row, col));
+                ship_new_cells.push_back(std::make_pair(new_row, new_col));
+            }
+        }
+    }
+    for (const auto& location : ship_cells) {
+        board[location.first][location.second] = Cell_State::Unmarked;
+    }
+    for (const auto& location : ship_new_cells) {
+        board[location.first][location.second] = ship_type;
+    }
 }
 
 void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
@@ -378,6 +427,15 @@ void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][B
                 break;
             case Special_Key::Right_Arrow:
                 move_ship({0, 1}, ship_type, board);
+                break;
+            case Special_Key::Left_Arrow:
+                move_ship({0, -1}, ship_type, board);
+                break;
+            case Special_Key::Down_Arrow:
+                move_ship({1, 0}, ship_type, board);
+                break;
+            case Special_Key::Up_Arrow:
+                move_ship({-1, 0}, ship_type, board);
                 break;
         }
 
