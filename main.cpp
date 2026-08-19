@@ -9,7 +9,7 @@
 #include "input.hpp"
 #include "ansi_codes.hpp"
 
-const static int BOARD_LENGTH = 10;
+constexpr unsigned int BOARD_LENGTH = 10;
 
 enum Cell_State {
     Unmarked,
@@ -329,8 +329,8 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
     unsigned int center_col;
     bool orientation; // 0 is horizontal, 1 is vertical
     unsigned int ship_cells_seen = 0;
-    for (int row = 0; row < BOARD_LENGTH; row++) {
-        for (int col = 0; col < BOARD_LENGTH; col++) {
+    for (unsigned int row = 0; row < BOARD_LENGTH; row++) {
+        for (unsigned int col = 0; col < BOARD_LENGTH; col++) {
             if (board[row][col] == ship_type) {
                 ship_cells_seen++;
                 if (ship_cells_seen == cells_until_center_of_rotation) {
@@ -751,7 +751,7 @@ void handle_player_versus_player_game() {
         return;
     }
 
-    
+
 
 
 
