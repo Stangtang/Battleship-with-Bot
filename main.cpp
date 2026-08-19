@@ -749,7 +749,7 @@ void handle_menu() {
         handle_player_2_ship_placement();
         break;
     case Play_Against_Bot:
-        // not implemented yet
+        // not quite implemented yet
         break;
     }
 }
