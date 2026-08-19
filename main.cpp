@@ -31,6 +31,14 @@ Cell_State player_2_defending_board[BOARD_LENGTH][BOARD_LENGTH] = {};
 Cell_State player_1_attacking_board[BOARD_LENGTH][BOARD_LENGTH] = {};
 Cell_State player_2_attacking_board[BOARD_LENGTH][BOARD_LENGTH] = {};
 
+void init_board(Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+    for (unsigned int i = 0; i < BOARD_LENGTH; i++) {
+        for (unsigned int j = 0; j < BOARD_LENGTH; j++) {
+            board[i][j] = Cell_State::Unmarked;
+        }
+    }
+}
+
 void clear_terminal()
 {
 #ifdef _WIN32
@@ -247,19 +255,78 @@ void print_board(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
     }
 }
 
-void place_ship(const Cell_State& ship_type, const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+void place_ship_randomly(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+    unsigned int length;
+    switch (ship_type) {
+    case Cell_State::Aircraft_Carrier: length = 5; break;
+    case Cell_State::Battleship:       length = 4; break;
+    case Cell_State::Cruiser:          length = 3; break;
+    case Cell_State::Submarine:        length = 3; break;
+    case Cell_State::Destroyer:        length = 2; break;
+    }
+
+    while (true) { // there should be no case where there is no valid placement for a ship
+        unsigned int direction = get_random_number_inclusive(1, 2);
+        if (direction == 1) { // left -> right
+            unsigned int row = get_random_number_inclusive(0, BOARD_LENGTH - 1);
+            unsigned int col = get_random_number_inclusive(0, BOARD_LENGTH - 1 - length + 1);
+
+            bool is_placement_valid = true;
+            for (unsigned int i = 0; i < length; i++) {
+                if (board[row][col + i] != Cell_State::Unmarked) {
+                    is_placement_valid = false;
+                }
+            }
+            
+            if (!is_placement_valid) {
+                continue;
+            }
+
+            for (unsigned int i = 0; i < length; i++) {
+                board[row][col + i] = ship_type;
+            }
+            
+            break;
+        } else if (direction == 2) { // up -> down
+            unsigned int row = get_random_number_inclusive(0, BOARD_LENGTH - 1 - length + 1);
+            unsigned int col = get_random_number_inclusive(0, BOARD_LENGTH - 1);
+
+            bool is_placement_valid = true;
+            for (unsigned int i = 0; i < length; i++) {
+                if (board[row + i][col] != Cell_State::Unmarked) {
+                    is_placement_valid = false;
+                }
+            }
+
+            if (!is_placement_valid) {
+                continue;
+            }
+
+            for (unsigned int i = 0; i < length; i++) {
+                board[row + i][col] = ship_type;
+            }
+
+            break;
+        }
+    }
+}
+
+void move_ship() {
+    
+}
+
+void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+
+    place_ship_randomly(ship_type, board);
+
     Special_Key input;
     do {
         clear_terminal();
         
-        std::cout << "USE ARROW KEYS TO CHANGE POSITION OF SHIP\n";
-        std::cout << "USE R TO ROTATE SHIP\n";
-        std::cout << "PRESS ENTER TO CONFIRM\n";
-        std::cout << '\n';
-        const std::vector<std::string> options = {
-            "Back",
-        };
-        print_options(options);
+        std::cout << "Arrow Keys | Change position of ship\n"; // Manual alignment will do
+        std::cout << "R          | Rotate ship\n";
+        std::cout << "Escape     | Reset layout\n";
+        std::cout << "Enter      | Confirm\n";
         std::cout << '\n';
 
         print_board(board);
@@ -269,6 +336,11 @@ void place_ship(const Cell_State& ship_type, const Cell_State (&board)[BOARD_LEN
         switch(input) {
             case Special_Key::Not_Recognized:
                 continue;
+                break;
+            case Special_Key::Escape:
+                init_board(board);
+                place_ship_randomly(ship_type, board);
+                break;
             case Special_Key::Right_Arrow:
                 break;
         }
@@ -307,7 +379,7 @@ void handle_play_against_human() {
         case 5:
             break;
         case 6:
-            player_1_defending_board[BOARD_LENGTH][BOARD_LENGTH] = {};
+            init_board(player_1_defending_board);
             menu.pop();
             break;
     }
