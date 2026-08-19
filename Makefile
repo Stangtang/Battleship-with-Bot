@@ -1,3 +1,4 @@
+# linux only
 COMPILEPATH := "./build/"
 
 all: build_input build_main build_final

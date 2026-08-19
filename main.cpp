@@ -157,24 +157,34 @@ bool are_cell_and_neighbors_unmarked(const int& row, const int& col, const Cell_
     return true;
 }
 
+void remove_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) { 
+    for (unsigned int i = 0; i < BOARD_LENGTH; i++) {
+        for (unsigned int j = 0; j < BOARD_LENGTH; j++) {
+            if (board[i][j] == ship_type) {
+                board[i][j] = Cell_State::Unmarked;
+            }
+        }
+    }
+};
+
 void place_ship_randomly(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
-    unsigned int length;
+    unsigned int ship_length;
     switch (ship_type) {
-    case Cell_State::Aircraft_Carrier: length = 5; break;
-    case Cell_State::Battleship:       length = 4; break;
-    case Cell_State::Cruiser:          length = 3; break;
-    case Cell_State::Submarine:        length = 3; break;
-    case Cell_State::Destroyer:        length = 2; break;
+    case Cell_State::Aircraft_Carrier: ship_length = 5; break;
+    case Cell_State::Battleship:       ship_length = 4; break;
+    case Cell_State::Cruiser:          ship_length = 3; break;
+    case Cell_State::Submarine:        ship_length = 3; break;
+    case Cell_State::Destroyer:        ship_length = 2; break;
     }
 
     while (true) { // there should be no case where there is no valid placement for a ship
         const unsigned int direction = get_random_number_inclusive(1, 2);
         if (direction == 1) { // left -> right
             const unsigned int row = get_random_number_inclusive(0, BOARD_LENGTH - 1);
-            const unsigned int col = get_random_number_inclusive(0, BOARD_LENGTH - 1 - length + 1);
+            const unsigned int col = get_random_number_inclusive(0, BOARD_LENGTH - 1 - ship_length + 1);
 
             bool is_placement_valid = true;
-            for (unsigned int i = 0; i < length; i++) {
+            for (unsigned int i = 0; i < ship_length; i++) {
                 if (!are_cell_and_neighbors_unmarked(row, col + i, board)) {
                     is_placement_valid = false;
                 }
@@ -184,17 +194,17 @@ void place_ship_randomly(const Cell_State& ship_type, Cell_State (&board)[BOARD_
                 continue;
             }
 
-            for (unsigned int i = 0; i < length; i++) {
+            for (unsigned int i = 0; i < ship_length; i++) {
                 board[row][col + i] = ship_type;
             }
             
             break;
         } else if (direction == 2) { // up -> down
-            const unsigned int row = get_random_number_inclusive(0, BOARD_LENGTH - 1 - length + 1);
+            const unsigned int row = get_random_number_inclusive(0, BOARD_LENGTH - 1 - ship_length + 1);
             const unsigned int col = get_random_number_inclusive(0, BOARD_LENGTH - 1);
 
             bool is_placement_valid = true;
-            for (unsigned int i = 0; i < length; i++) {
+            for (unsigned int i = 0; i < ship_length; i++) {
                 if (!are_cell_and_neighbors_unmarked(row + i, col, board)) {
                     is_placement_valid = false;
                 }
@@ -204,7 +214,7 @@ void place_ship_randomly(const Cell_State& ship_type, Cell_State (&board)[BOARD_
                 continue;
             }
 
-            for (unsigned int i = 0; i < length; i++) {
+            for (unsigned int i = 0; i < ship_length; i++) {
                 board[row + i][col] = ship_type;
             }
 
@@ -556,18 +566,23 @@ void handle_play_against_human() {
 
     switch(get_option_selected(options)) {
         case 1:
+            remove_ship(Aircraft_Carrier, player_1_defending_board);
             place_ship(Aircraft_Carrier, player_1_defending_board);
             break;
         case 2:
+            remove_ship(Battleship, player_1_defending_board);
             place_ship(Battleship, player_1_defending_board);
             break;
         case 3:
+            remove_ship(Cruiser, player_1_defending_board);
             place_ship(Cruiser, player_1_defending_board);
             break;
         case 4:
+            remove_ship(Submarine, player_1_defending_board);
             place_ship(Submarine, player_1_defending_board);
             break;
         case 5:
+            remove_ship(Destroyer, player_1_defending_board);
             place_ship(Destroyer, player_1_defending_board);
             break;
         case 6:
