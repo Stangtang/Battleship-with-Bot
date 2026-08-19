@@ -157,7 +157,15 @@ bool are_cell_and_neighbors_unmarked(const int& row, const int& col, const Cell_
     return true;
 }
 
-void remove_ship(const Cell_State &ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]);
+void remove_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) { 
+    for (unsigned int i = 0; i < BOARD_LENGTH; i++) {
+        for (unsigned int j = 0; j < BOARD_LENGTH; j++) {
+            if (board[i][j] == ship_type) {
+                board[i][j] = Cell_State::Unmarked;
+            }
+        }
+    }
+};
 
 void place_ship_randomly(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
     unsigned int ship_length;
@@ -498,18 +506,23 @@ void handle_play_against_human() {
 
     switch(get_option_selected(options)) {
         case 1:
+            remove_ship(Aircraft_Carrier, player_1_defending_board);
             place_ship(Aircraft_Carrier, player_1_defending_board);
             break;
         case 2:
+            remove_ship(Battleship, player_1_defending_board);
             place_ship(Battleship, player_1_defending_board);
             break;
         case 3:
+            remove_ship(Cruiser, player_1_defending_board);
             place_ship(Cruiser, player_1_defending_board);
             break;
         case 4:
+            remove_ship(Submarine, player_1_defending_board);
             place_ship(Submarine, player_1_defending_board);
             break;
         case 5:
+            remove_ship(Destroyer, player_1_defending_board);
             place_ship(Destroyer, player_1_defending_board);
             break;
         case 6:
