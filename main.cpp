@@ -565,7 +565,51 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
         return;
     }
 
+    switch(ship_type) {
+    case Aircraft_Carrier:
+        if (orientation == 0) {
+            board[center_row][center_col - 1] = Unmarked;
+            board[center_row][center_col - 2] = Unmarked;
+            board[center_row][center_col + 1] = Unmarked;
+            board[center_row][center_col + 2] = Unmarked;
+            board[center_row - 1][center_col] = ship_type;
+            board[center_row - 2][center_col] = ship_type;
+            board[center_row + 1][center_col] = ship_type;
+            board[center_row + 2][center_col] = ship_type;
+        } else if (orientation == 1) {
+            board[center_row - 1][center_col] = Unmarked;
+            board[center_row - 2][center_col] = Unmarked;
+            board[center_row + 1][center_col] = Unmarked;
+            board[center_row + 2][center_col] = Unmarked;
+            board[center_row][center_col - 1] = ship_type;
+            board[center_row][center_col - 2] = ship_type;
+            board[center_row][center_col + 1] = ship_type;
+            board[center_row][center_col + 2] = ship_type;
+        }
+    break;
+    case Battleship:
+        if (orientation == 0) {
 
+        } else if (orientation == 1) {
+
+        }
+    break;
+    case Cruiser: // same as submarine
+    case Submarine:
+        if (orientation == 0) {
+
+        } else if (orientation == 1) {
+
+        }
+    break;
+    case Destroyer:
+        if (orientation == 0) {
+
+        } else if (orientation == 1) {
+
+        }
+    break;
+    }
 
 
 }
