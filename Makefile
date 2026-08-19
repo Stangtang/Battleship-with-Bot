@@ -1,10 +1,10 @@
 # linux only
 COMPILEPATH := "./build/"
 
-all: build_input build_main build_final
+all: build_includes build_main build_final
 
-build_input:
-	@echo "Compiling & assembling source..."
+build_includes:
+	@echo "Compiling & assembling includes..."
 	@mkdir -p $(COMPILEPATH)
 	clang++ -c input.cpp -o $(COMPILEPATH)/input.o
 

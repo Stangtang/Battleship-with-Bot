@@ -8,13 +8,9 @@
 #include <vector>
 
 #include "input.hpp"
+#include "ansi_codes.hpp"
 
 #define BOARD_LENGTH 10
-
-#define ANSI_RESET "\033[0m"
-#define ANSI_RED_BACKGROUND "\033[41m"
-#define ANSI_BRIGHTER_RED_BACKGROUND "\033[101m"
-#define ANSI_CLEAR_TERMINAL "\033[2J\033[1;1H"
 
 enum Cell_State {
     Unmarked,
@@ -117,19 +113,19 @@ void print_board(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
                 std::cout << 'X';
                 break;
             case Cell_State::Aircraft_Carrier: // TODO: make ships display in diff colors 
-                std::cout << 'a'; //red
+                std::cout << ANSI_RED_FOREGROUND << '#' << ANSI_RESET;
                 break;
             case Cell_State::Battleship:
-                std::cout << 'b'; //blue
+                std::cout << ANSI_BLUE_FOREGROUND << '#' << ANSI_RESET;
                 break;
             case Cell_State::Cruiser:
-                std::cout << 'c'; //green
+                std::cout << ANSI_GREEN_FOREGROUND << '#' << ANSI_RESET;
                 break;
             case Cell_State::Submarine:
-                std::cout << 's'; //brown
+                std::cout << ANSI_YELLOW_BACKGROUND << '#' << ANSI_RESET;
                 break;
             case Cell_State::Destroyer:
-                std::cout << 'd'; //purple
+                std::cout << ANSI_MAGENTA_FOREGROUND << '#' << ANSI_RESET;
                 break;
             }
             std::cout << ' ';
