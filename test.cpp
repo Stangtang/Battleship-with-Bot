@@ -130,6 +130,9 @@ enum Special_Key {
 #endif
 
 int main() {
+    std::cout << "\033[34;43mBlue text on yellow background\033[0m\n";
+    std::cout << "Regular text\n";
+
     while (true) {
         switch(get_special_keystroke()) {
             case Special_Key::Enter:       std::cout << "ENTER KEY PRESSED!!\n";   break;

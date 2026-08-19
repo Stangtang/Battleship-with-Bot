@@ -8,6 +8,9 @@
 
 #define BOARD_LENGTH 10
 
+#define ANSI_RED_BACKGROUND "\033[41m"
+#define ANSI_BRIGHTER_RED_BACKGROUND "\033[101m"
+
 enum Cell_State {
     Unmarked,
     Miss,
@@ -206,8 +209,8 @@ void handle_start() {
     std::cout << "PRESS NUMBER KEY TO MAKE SELECTION\n";
 
     const std::vector<std::string> options = {
-        "Play against bot",
-        "Play against another human"
+        "Play Against Bot",
+        "Play Against Another Person"
     };
     print_options(options);
     switch(get_option_selected(options)) {
@@ -255,6 +258,20 @@ void print_board(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
     }
 }
 
+bool are_cell_and_neighbors_unmarked(const int& row, const int& col, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+    for (int i = row - 1; i <= row + 1; i++) {
+        for (int j = col - 1; j <= col + 1; j++) {
+            if (i < 0 || i >= BOARD_LENGTH || j < 0 || j >= BOARD_LENGTH) {
+                continue;
+            }
+            if (board[i][j] != Cell_State::Unmarked) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 void place_ship_randomly(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
     unsigned int length;
     switch (ship_type) {
@@ -266,14 +283,14 @@ void place_ship_randomly(const Cell_State& ship_type, Cell_State (&board)[BOARD_
     }
 
     while (true) { // there should be no case where there is no valid placement for a ship
-        unsigned int direction = get_random_number_inclusive(1, 2);
+        const unsigned int direction = get_random_number_inclusive(1, 2);
         if (direction == 1) { // left -> right
-            unsigned int row = get_random_number_inclusive(0, BOARD_LENGTH - 1);
-            unsigned int col = get_random_number_inclusive(0, BOARD_LENGTH - 1 - length + 1);
+            const unsigned int row = get_random_number_inclusive(0, BOARD_LENGTH - 1);
+            const unsigned int col = get_random_number_inclusive(0, BOARD_LENGTH - 1 - length + 1);
 
             bool is_placement_valid = true;
             for (unsigned int i = 0; i < length; i++) {
-                if (board[row][col + i] != Cell_State::Unmarked) {
+                if (!are_cell_and_neighbors_unmarked(row, col + i, board)) {
                     is_placement_valid = false;
                 }
             }
@@ -288,12 +305,12 @@ void place_ship_randomly(const Cell_State& ship_type, Cell_State (&board)[BOARD_
             
             break;
         } else if (direction == 2) { // up -> down
-            unsigned int row = get_random_number_inclusive(0, BOARD_LENGTH - 1 - length + 1);
-            unsigned int col = get_random_number_inclusive(0, BOARD_LENGTH - 1);
+            const unsigned int row = get_random_number_inclusive(0, BOARD_LENGTH - 1 - length + 1);
+            const unsigned int col = get_random_number_inclusive(0, BOARD_LENGTH - 1);
 
             bool is_placement_valid = true;
             for (unsigned int i = 0; i < length; i++) {
-                if (board[row + i][col] != Cell_State::Unmarked) {
+                if (!are_cell_and_neighbors_unmarked(row + i, col, board)) {
                     is_placement_valid = false;
                 }
             }
@@ -311,20 +328,38 @@ void place_ship_randomly(const Cell_State& ship_type, Cell_State (&board)[BOARD_
     }
 }
 
-void move_ship() {
-    
+std::string get_ship_name(const Cell_State& ship_type) {
+    switch(ship_type) {
+        case Cell_State::Aircraft_Carrier:
+            return "Aircraft Carrier";
+        case Cell_State::Battleship:
+            return "Battleship";
+        case Cell_State::Cruiser:
+            return "Cruiser";
+        case Cell_State::Submarine:
+            return "Submarine";
+        case Cell_State::Destroyer:
+            return "Destroyer";
+        default:
+            return "\033[34;43mERROR: NOT A SHIP NAME\033[0m";
+    }
+}
+
+void move_ship(const int (&direction)[2], const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+
 }
 
 void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
-
     place_ship_randomly(ship_type, board);
+
+    const std::string ship_name = get_ship_name(ship_type);
 
     Special_Key input;
     do {
         clear_terminal();
-        
-        std::cout << "Arrow Keys | Change position of ship\n"; // Manual alignment will do
-        std::cout << "R          | Rotate ship\n";
+
+        std::cout << "Arrow Keys | Change position of " << ship_name << '\n'; // Manual alignment will do
+        std::cout << "R          | Rotate " << ship_name << '\n';
         std::cout << "Escape     | Reset layout\n";
         std::cout << "Enter      | Confirm\n";
         std::cout << '\n';
@@ -342,6 +377,7 @@ void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][B
                 place_ship_randomly(ship_type, board);
                 break;
             case Special_Key::Right_Arrow:
+                move_ship({0, 1}, ship_type, board);
                 break;
         }
 
