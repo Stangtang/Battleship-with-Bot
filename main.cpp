@@ -1,7 +1,9 @@
 #include <algorithm>
+#include <cctype>
 #include <iostream>
 #include <random>
 #include <stack>
+#include <string>
 #include <utility>
 // #include <unordered_map>
 #include <vector>
@@ -72,6 +74,17 @@ int get_random_number_inclusive(const int& bound_1, const int& bound_2) {
     std::uniform_int_distribution<int> dist(lower_bound, upper_bound);
     const int random_number = dist(main_rd);
     return random_number;
+}
+
+std::string to_upper(const std::string& s) {
+    std::string result = s;
+
+    std::transform(result.begin(), result.end(), result.begin(),
+                   [](unsigned char c) {
+                       return std::toupper(c);
+                   });
+
+    return result;
 }
 
 bool is_option_selection_input_valid(int key_pressed, std::uint8_t num_options) {
@@ -245,7 +258,7 @@ void place_ship_randomly(const Cell_State& ship_type, Cell_State (&board)[BOARD_
     }
 }
 
-std::string get_ship_name(const Cell_State& ship_type) {
+std::string get_ship_text(const Cell_State& ship_type) {
     switch(ship_type) {
         case Cell_State::Aircraft_Carrier:
             return "Aircraft Carrier";
@@ -259,6 +272,14 @@ std::string get_ship_name(const Cell_State& ship_type) {
             return "Destroyer";
         default:
             return "\033[34;43mERROR: NOT A SHIP NAME\033[0m"; // This text should never show
+    }
+}
+
+std::string get_player_text(const Player& player) {
+    switch(player) {
+        case Player_1: return "Player 1";
+        case Player_2: return "Player 2";
+        // add bot case?
     }
 }
 
@@ -526,11 +547,14 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
 void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
     place_ship_randomly(ship_type, board);
 
-    const std::string ship_name = get_ship_name(ship_type);
+    const std::string ship_name = get_ship_text(ship_type);
 
     Special_Key input;
     do {
         clear_terminal();
+
+        std::cout << "PLACING " << to_upper(ship_name) << " FOR " << to_upper(get_player_text(curr_player)) << "\n";
+        std::cout << '\n';
 
         std::cout << "Arrow Keys | Change position of " << ship_name << '\n'; // Manual alignment will do
         std::cout << "R          | Rotate " << ship_name << '\n';
@@ -661,7 +685,8 @@ void handle_player_1_ship_placement() {
 }
 
 void handle_player_2_ship_placement() {
-    std::cout << "PLAYER 1 SHIP PLACEMENT CONFIRMED!\nPLAYER 2, CHOOSE YOUR SHIP LAYOUT\n";
+    // std::cout << "PLAYER 1 SHIP PLACEMENT CONFIRMED!\n";
+    std::cout << "PLAYER 2, CHOOSE YOUR SHIP LAYOUT\n";
     std::cout << '\n';
 
     const std::vector<std::string> options = {
@@ -724,10 +749,13 @@ void handle_player_2_ship_placement() {
 
 void handle_play_against_human() {
     if (!are_all_ships_placed(player_1_defending_board)) {
+        curr_player = Player_1;
         menu.push(Menu::Player_1_Ship_Placement);
     } else if (!are_all_ships_placed(player_2_defending_board)) {
+        curr_player = Player_2;
         menu.push(Menu::Player_2_Ship_Placement);
     } else {
+        curr_player = None;
         menu.push(Menu::Player_Versus_Player_Game);
     }
 }
