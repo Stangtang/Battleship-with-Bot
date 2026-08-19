@@ -76,12 +76,14 @@ int get_random_number_inclusive(const int& bound_1, const int& bound_2) {
     return random_number;
 }
 
-std::string to_upper(const std::string& s) {
-    std::string r = s;
-    std::transform(r.begin(), r.end(), r.begin(),
-                   [](unsigned char c) { return std::toupper(c); });
-    return r;
-}
+auto to_upper = [](std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(),
+        [](unsigned char c) {
+            return std::toupper(c);
+        }
+    );
+    return s;
+};
 
 bool is_option_selection_input_valid(int key_pressed, std::uint8_t num_options) {
     const char key_pressed_char = static_cast<char>(key_pressed);
