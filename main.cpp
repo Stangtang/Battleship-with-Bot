@@ -122,55 +122,80 @@ enum Special_Key {
         return Special_Key::Not_Recognized;
     }
 #else
-    #include <termios.h>
-    #include <unistd.h>
-    #include <cstdio>
-    #include <sys/select.h>
+#include <termios.h>
+#include <unistd.h>
+#include <sys/select.h>
 
-    Special_Key get_special_keystroke() {
-        termios oldt, newt;
+Special_Key get_special_keystroke() {
+    termios oldt, newt;
 
-        tcgetattr(STDIN_FILENO, &oldt);
-        newt = oldt;
-        newt.c_lflag &= ~(ICANON | ECHO);
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
 
-        tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    newt.c_lflag &= ~(ICANON | ECHO);
 
-        int ch = getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
-        Special_Key result = Special_Key::Not_Recognized;
+    char ch;
+    if (read(STDIN_FILENO, &ch, 1) != 1) {
+        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+        return Special_Key::Not_Recognized;
+    }
 
-        if (ch == '\n' || ch == '\r') {
-            result = Special_Key::Enter;
-        } else if (ch == 'r' || ch == 'R') {
-            result = Special_Key::R;
-        } else if (ch == 27) { // Escape sequence
-            fd_set set;
-            FD_ZERO(&set);
-            FD_SET(STDIN_FILENO, &set);
+    Special_Key result = Special_Key::Not_Recognized;
 
-            timeval timeout{};
-            timeout.tv_sec = 0;
-            timeout.tv_usec = 0;
+    if (ch == '\n' || ch == '\r') {
+        result = Special_Key::Enter;
+    }
+    else if (ch == 'r' || ch == 'R') {
+        result = Special_Key::R;
+    }
+    else if (ch == 27) { // esc
+        fd_set set;
+        FD_ZERO(&set);
+        FD_SET(STDIN_FILENO, &set);
 
-            if (select(STDIN_FILENO + 1, &set, nullptr, nullptr, &timeout) == 0) {
-                result = Special_Key::Escape;
-            } else {
-                if (getchar() == '[') {
-                    switch (getchar()) {
+        timeval timeout{};
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 50000; // 50 ms
+
+        int ready = select(STDIN_FILENO + 1,
+                           &set,
+                           nullptr,
+                           nullptr,
+                           &timeout);
+
+        if (ready <= 0) {
+            // No additional bytes arrived: treat as escape key
+            result = Special_Key::Escape;
+        }
+        else {
+            char seq[2];
+
+            if (read(STDIN_FILENO, &seq[0], 1) == 1 &&
+                read(STDIN_FILENO, &seq[1], 1) == 1) {
+                if (seq[0] == '[') {
+                    switch (seq[1]) {
                         case 'A': result = Special_Key::Up_Arrow;    break;
                         case 'B': result = Special_Key::Down_Arrow;  break;
                         case 'C': result = Special_Key::Right_Arrow; break;
                         case 'D': result = Special_Key::Left_Arrow;  break;
+                        default:  result = Special_Key::Not_Recognized;
                     }
                 }
+                else {
+                    result = Special_Key::Escape;
+                }
+            }
+            else {
+                result = Special_Key::Escape;
             }
         }
-
-        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-
-        return result;
     }
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    return result;
+}
 #endif
 
 int get_random_number_inclusive(const int& bound_1, const int& bound_2) {
@@ -260,7 +285,7 @@ void print_board(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
     }
 }
 
-bool are_cell_and_neighbors_unmarked(const int& row, const int& col, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+bool are_cell_and_neighbors_unmarked(const int& row, const int& col, const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
     for (int i = row - 1; i <= row + 1; i++) {
         for (int j = col - 1; j <= col + 1; j++) {
             if (i < 0 || i >= BOARD_LENGTH || j < 0 || j >= BOARD_LENGTH) {
@@ -365,6 +390,7 @@ void move_ship(const int (&direction)[2], const Cell_State& ship_type, Cell_Stat
 
                 if (board[new_row][new_col] != Cell_State::Unmarked && board[new_row][new_col] != ship_type) {
                     can_move = false;
+                    continue;
                 }
             }
         }
@@ -419,7 +445,6 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
                 if (ship_cells_seen == cells_until_center_of_rotation) {
                     center_row = row;
                     center_col = col;
-
                     if (col == 0) {
                         orientation = 1;
                     } else if (board[row][col - 1] == board[row][col]) {
@@ -432,23 +457,98 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
         }
     }
     
-    bool can_move = true;
+    bool can_rotate = true;
     switch(ship_type) {
     case Aircraft_Carrier:
         if (orientation == 0) {
-            if (center_col <= 1) {
-                
+            if (center_row <= 1 || center_row >= BOARD_LENGTH - 2) {
+                can_rotate = false;
+                break;
             }
-            if (board[center_row - 1][center_col] ) {
-
+            if (board[center_row - 1][center_col] != Unmarked || 
+                board[center_row - 2][center_col] != Unmarked ||
+                board[center_row + 1][center_col] != Unmarked ||
+                board[center_row + 2][center_col] != Unmarked) {
+                can_rotate = false;
+                break;
+            }
+        } else if (orientation == 1) {
+            if (center_col <= 1 || center_col >= BOARD_LENGTH - 2) {
+                can_rotate = false;
+                break;
+            }
+            if (board[center_row][center_col - 1] != Unmarked || 
+                board[center_row][center_col - 2] != Unmarked ||
+                board[center_row][center_col + 1] != Unmarked ||
+                board[center_row][center_col + 2] != Unmarked) {
+                can_rotate = false;
+                break;
             }
         }
     break;
-        case Battleship:       cells_until_center_of_rotation = 2; break;
-        case Cruiser:          cells_until_center_of_rotation = 2; break;
-        case Submarine:        cells_until_center_of_rotation = 2; break;
-        case Destroyer:        cells_until_center_of_rotation = 1; break;
+    case Battleship:
+        if (orientation == 0) {
+            if (center_row <= 0 || center_row >= BOARD_LENGTH - 2) {
+                can_rotate = false;
+                break;
+            }
+            if (board[center_row - 1][center_col] != Unmarked || 
+                board[center_row + 1][center_col] != Unmarked ||
+                board[center_row + 2][center_col] != Unmarked) {
+                can_rotate = false;
+                break;
+            }
+        } else if (orientation == 1) {
+            if (center_col <= 0 || center_col >= BOARD_LENGTH - 2) {
+                can_rotate = false;
+                break;
+            }
+            if (board[center_row][center_col - 1] != Unmarked || 
+                board[center_row][center_col + 1] != Unmarked ||
+                board[center_row][center_col + 2] != Unmarked) {
+                can_rotate = false;
+                break;
+            }
+        }
+    break;
+    case Cruiser: // same as submarine
+    case Submarine:
+        if (orientation == 0) {
+            if (center_row <= 0 || center_row >= BOARD_LENGTH - 1) {
+                can_rotate = false;
+                break;
+            }
+            if (board[center_row - 1][center_col] != Unmarked || 
+                board[center_row + 1][center_col] != Unmarked) {
+                can_rotate = false;
+                break;
+            }
+        } else if (orientation == 1) {
+            if (center_col <= 0 || center_col >= BOARD_LENGTH - 1) {
+                can_rotate = false;
+                break;
+            }
+            if (board[center_row][center_col - 1] != Unmarked || 
+                board[center_row][center_col + 1] != Unmarked) {
+                can_rotate = false;
+                break;
+            }
+        }
+    break;
+    case Destroyer:
+    break;
     }
+
+    if (!can_rotate) {
+        std::cout << ANSI_RED_BACKGROUND << "\nCANNOT ROTATE THERE" << ANSI_RESET << '\n';
+        std::cout << "Press any key to continue\n";
+        get_keystroke();
+        return;
+    }
+
+
+
+
 }
 
 void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
@@ -509,6 +609,7 @@ void handle_play_against_human() {
         "Place Cruiser          (Length 3)",
         "Place Submarine        (Length 3)",
         "Place Destroyer        (Length 2)",
+        "Reset Layout",
         "Back",
     };
     print_options(options);
@@ -518,17 +619,24 @@ void handle_play_against_human() {
 
     switch(get_option_selected(options)) {
         case 1:
-            place_ship(Cell_State::Aircraft_Carrier, player_1_defending_board);
+            place_ship(Aircraft_Carrier, player_1_defending_board);
             break;
         case 2:
+            place_ship(Battleship, player_1_defending_board);
             break;
         case 3:
+            place_ship(Cruiser, player_1_defending_board);
             break;
         case 4:
+            place_ship(Submarine, player_1_defending_board);
             break;
         case 5:
+            place_ship(Destroyer, player_1_defending_board);
             break;
         case 6:
+            init_board(player_1_defending_board);
+            break;
+        case 7:
             init_board(player_1_defending_board);
             menu.pop();
             break;
