@@ -3,24 +3,13 @@
 #include <random>
 #include <stack>
 #include <utility>
+// #include <unordered_map>
 #include <vector>
 
 #include "input.hpp"
 #include "ansi_codes.hpp"
 
-#define BOARD_LENGTH 10
-
-#define ANSI_AIRCRAFT_CARRIER_COLOR ANSI_RED_FOREGROUND
-#define ANSI_BATTLESHIP_COLOR       ANSI_CYAN_FOREGROUND
-#define ANSI_CRUISER_COLOR          ANSI_GREEN_FOREGROUND
-#define ANSI_SUBMARINE_COLOR        ANSI_YELLOW_FOREGROUND
-#define ANSI_DESTROYER_COLOR        ANSI_MAGENTA_FOREGROUND
-
-#define PRINT_AIRCRAFT_CARRIER_WITH_COLOR ANSI_AIRCRAFT_CARRIER_COLOR << '#' << ANSI_RESET
-#define PRINT_BATTLESHIP_WITH_COLOR       ANSI_BATTLESHIP_COLOR       << '#' << ANSI_RESET
-#define PRINT_CRUISER_WITH_COLOR          ANSI_CRUISER_COLOR          << '#' << ANSI_RESET
-#define PRINT_SUBMARINE_WITH_COLOR        ANSI_SUBMARINE_COLOR        << '#' << ANSI_RESET
-#define PRINT_DESTROYER_WITH_COLOR        ANSI_DESTROYER_COLOR        << '#' << ANSI_RESET
+const static int BOARD_LENGTH = 10;
 
 enum Cell_State {
     Unmarked,
@@ -42,10 +31,19 @@ enum Menu {
 };
 
 std::stack<Menu> menu;
+// SAVE FOR LATER
+// std::unordered_map<Cell_State, std::vector<std::pair<int, int>>>
+//     player_one_ship_placements, player_two_ship_placements;
 Cell_State player_1_defending_board[BOARD_LENGTH][BOARD_LENGTH] = {};
 Cell_State player_2_defending_board[BOARD_LENGTH][BOARD_LENGTH] = {};
 Cell_State player_1_attacking_board[BOARD_LENGTH][BOARD_LENGTH] = {};
 Cell_State player_2_attacking_board[BOARD_LENGTH][BOARD_LENGTH] = {};
+std::random_device main_rd;
+
+// SAVE FOR LATER
+// void init_ship_placements(std::unordered_map<Cell_State, std::vector<std::pair<int, int>>> (&ship_placements)) {
+//   ship_placements.clear();
+// }
 
 void init_board(Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
     for (unsigned int i = 0; i < BOARD_LENGTH; i++) {
@@ -60,11 +58,10 @@ void clear_terminal() {
 }
 
 int get_random_number_inclusive(const int& bound_1, const int& bound_2) {
-    std::random_device rd;
     const int lower_bound = std::min(bound_1, bound_2);
     const int upper_bound = std::max(bound_1, bound_2);
     std::uniform_int_distribution<int> dist(lower_bound, upper_bound);
-    const int random_number = dist(rd);
+    const int random_number = dist(main_rd);
     return random_number;
 }
 
@@ -321,14 +318,15 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
         case Cruiser:          cells_until_center_of_rotation = 2; break;
         case Submarine:        cells_until_center_of_rotation = 2; break;
         case Destroyer:        cells_until_center_of_rotation = 1; break;
+        default: return;
     }
 
     unsigned int center_row;
     unsigned int center_col;
-    bool orientation; // 0 is left-right, 1 is top-down
+    bool orientation; // 0 is horizontal, 1 is vertical
     unsigned int ship_cells_seen = 0;
-    for (size_t row = 0; row < BOARD_LENGTH; row++) {
-        for (size_t col = 0; col < BOARD_LENGTH; col++) {
+    for (int row = 0; row < BOARD_LENGTH; row++) {
+        for (int col = 0; col < BOARD_LENGTH; col++) {
             if (board[row][col] == ship_type) {
                 ship_cells_seen++;
                 if (ship_cells_seen == cells_until_center_of_rotation) {
@@ -445,6 +443,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
             }
         }
     break;
+    default: return;
     }
 
     if (!can_rotate) {
@@ -516,6 +515,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
             board[center_row][center_col + 1] = ship_type;
         }
     break;
+    default: return;
     }
 }
 
@@ -564,6 +564,7 @@ void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][B
             case Special_Key::R:
                 rotate_ship(ship_type, board);
                 break;
+            default: break;
         }
 
     } while(input != Special_Key::Enter);
@@ -581,8 +582,8 @@ bool are_all_ships_placed(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH])
     for (Cell_State ship : ships) {
         bool found = false;
 
-        for (size_t i = 0; i < BOARD_LENGTH && !found; i++) {
-            for (size_t j = 0; j < BOARD_LENGTH; j++) {
+        for (int i = 0; i < BOARD_LENGTH && !found; i++) {
+            for (int j = 0; j < BOARD_LENGTH; j++) {
                 if (board[i][j] == ship) {
                     found = true;
                     break;
