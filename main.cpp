@@ -128,10 +128,10 @@ void handle_start() {
     }
 }
 
-void print_board(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
-    for (const auto& row : board) {
-        for (const auto& cell : row) {
-            switch(cell) {
+void print_board(const Cell_State (*board)[BOARD_LENGTH]) {
+    for (unsigned int row = 0; row < BOARD_LENGTH; row++) {
+        for (unsigned int col = 0; col < BOARD_LENGTH; col++) {
+            switch(board[row][col]) {
             case Cell_State::Unmarked:
                 std::cout << '-';
                 break;
@@ -172,8 +172,11 @@ void print_ship_color_legend() {
     std::cout << PRINT_DESTROYER_WITH_COLOR << " : Destroyer\n";
 }
 
-void print_enemy_seas_legend() { // WIP
-    // hit, miss, etc.
+void print_enemy_seas_legend() {
+    std::cout << "ENEMY SEAS LEGEND\n";
+    std::cout << "- : Unmarked\n";
+    std::cout << "O : Miss\n";
+    std::cout << "X : Hit\n";
 }
 
 bool is_position_in_bounds(const int& row, const int& col) {
@@ -773,16 +776,104 @@ Player get_first_player() {
     }
 }
 
+void view_enemy_seas(const Cell_State (*curr_player_attacking_board)[BOARD_LENGTH]) {
+    clear_terminal();
+
+    std::cout << "VIEWING ENEMY SEAS\n";
+    std::cout << '\n';
+    
+    const std::vector<std::string> options = {
+        "Back",
+    };
+    print_options(options);
+    std::cout << '\n';
+
+    print_enemy_seas_legend();
+    std::cout << '\n';
+    std::cout << "ENEMY SEAS\n";
+    print_board(curr_player_attacking_board);
+
+    switch (get_option_selected(options)) {
+    case 1: return;
+    }
+}
+
+void view_your_seas(const Cell_State (*curr_player_defending_board)[BOARD_LENGTH]) {
+    clear_terminal();
+
+    std::cout << "VIEWING YOUR SEAS\n";
+    std::cout << '\n';
+    
+    const std::vector<std::string> options = {
+        "Back",
+    };
+    print_options(options);
+    std::cout << '\n';
+
+    print_ship_color_legend();
+    std::cout << '\n';
+    std::cout << "YOUR SEAS\n";
+    print_board(curr_player_defending_board);
+
+    switch (get_option_selected(options)) {
+    case 1: return;
+    }
+}
+
 void handle_player_versus_player_game() {
     if (curr_player == None) {
         curr_player = get_first_player();
         return;
     }
 
+    const std::string curr_player_text = get_player_text(curr_player);
+    Cell_State (*curr_player_defending_board)[BOARD_LENGTH];
+    Cell_State (*curr_player_attacking_board)[BOARD_LENGTH];
+    Cell_State (*enemy_player_defending_board)[BOARD_LENGTH];
+    switch (curr_player) {
+        case Player_1:
+            curr_player_defending_board = player_1_defending_board;
+            curr_player_attacking_board = player_1_attacking_board;
+            enemy_player_defending_board = player_2_defending_board;
+            break;
+        case Player_2:
+            curr_player_defending_board = player_2_defending_board;
+            curr_player_attacking_board = player_2_attacking_board;
+            enemy_player_defending_board = player_1_defending_board;
+            break;
+    }
+
+    std::cout << to_upper(get_player_text(curr_player)) << "'S TURN\n";
+    std::cout << '\n';
+
+    const std::vector<std::string> options = {
+        "View Enemy Seas",
+        "View Your Seas",
+        "Attack",
+    };
+    print_options(options);
+    std::cout << '\n';
+
+    std::cout << "ENEMY SEAS\n";
+    print_board(curr_player_attacking_board);
+    std::cout << '\n';
+    
+    std::cout << "YOUR SEAS\n";
+    print_board(curr_player_defending_board);
+
+    switch(get_option_selected(options)) {
+        case 1:
+            view_enemy_seas(curr_player_attacking_board);
+            return;
+        case 2:
+            view_your_seas(curr_player_defending_board);
+            return;
+        case 3: // attack
 
 
-
-
+        
+            break; // or return idk
+    }
 
 }
 
