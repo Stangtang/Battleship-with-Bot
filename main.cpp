@@ -12,6 +12,18 @@
 
 #define BOARD_LENGTH 10
 
+#define ANSI_AIRCRAFT_CARRIER_COLOR ANSI_RED_FOREGROUND
+#define ANSI_BATTLESHIP_COLOR       ANSI_BLUE_FOREGROUND
+#define ANSI_CRUISER_COLOR          ANSI_GREEN_FOREGROUND
+#define ANSI_SUBMARINE_COLOR        ANSI_YELLOW_FOREGROUND
+#define ANSI_DESTROYER_COLOR        ANSI_MAGENTA_FOREGROUND
+
+#define PRINT_AIRCRAFT_CARRIER_WITH_COLOR ANSI_AIRCRAFT_CARRIER_COLOR << '#' << ANSI_RESET
+#define PRINT_BATTLESHIP_WITH_COLOR       ANSI_BATTLESHIP_COLOR       << '#' << ANSI_RESET
+#define PRINT_CRUISER_WITH_COLOR          ANSI_CRUISER_COLOR          << '#' << ANSI_RESET
+#define PRINT_SUBMARINE_WITH_COLOR        ANSI_SUBMARINE_COLOR        << '#' << ANSI_RESET
+#define PRINT_DESTROYER_WITH_COLOR        ANSI_DESTROYER_COLOR        << '#' << ANSI_RESET
+
 enum Cell_State {
     Unmarked,
     Miss,
@@ -113,25 +125,30 @@ void print_board(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
                 std::cout << 'X';
                 break;
             case Cell_State::Aircraft_Carrier: // TODO: make ships display in diff colors 
-                std::cout << ANSI_RED_FOREGROUND << '#' << ANSI_RESET;
+                std::cout << PRINT_AIRCRAFT_CARRIER_WITH_COLOR;
                 break;
             case Cell_State::Battleship:
-                std::cout << ANSI_BLUE_FOREGROUND << '#' << ANSI_RESET;
+                std::cout << PRINT_BATTLESHIP_WITH_COLOR;
                 break;
             case Cell_State::Cruiser:
-                std::cout << ANSI_GREEN_FOREGROUND << '#' << ANSI_RESET;
+                std::cout << PRINT_CRUISER_WITH_COLOR;
                 break;
             case Cell_State::Submarine:
-                std::cout << ANSI_YELLOW_BACKGROUND << '#' << ANSI_RESET;
+                std::cout << PRINT_SUBMARINE_WITH_COLOR;
                 break;
             case Cell_State::Destroyer:
-                std::cout << ANSI_MAGENTA_FOREGROUND << '#' << ANSI_RESET;
+                std::cout << PRINT_DESTROYER_WITH_COLOR;
                 break;
             }
             std::cout << ' ';
         }
         std::cout << '\n';
     }
+}
+
+void print_ship_color_legend() {
+    std::cout << "Ship Color Legend:\n";
+    
 }
 
 bool are_cell_and_neighbors_unmarked(const int& row, const int& col, const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
