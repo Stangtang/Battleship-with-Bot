@@ -2,6 +2,8 @@
 
 #define ANSI_CLEAR_TERMINAL "\e[2J\e[1;1H"
 
+// https://gist.github.com/RabaDabaDoba/145049536f815903c79944599c6f952a
+
 // Regular Foreground
 #define ANSI_BLACK_FOREGROUND   "\e[0;30m"
 #define ANSI_RED_FOREGROUND     "\e[0;31m"
