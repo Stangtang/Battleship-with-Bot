@@ -11,19 +11,7 @@
 #include "input.hpp"
 #include "ansi_codes.hpp"
 
-#define BOARD_LENGTH 10
-
-#define ANSI_AIRCRAFT_CARRIER_COLOR ANSI_RED_FOREGROUND
-#define ANSI_BATTLESHIP_COLOR       ANSI_CYAN_FOREGROUND
-#define ANSI_CRUISER_COLOR          ANSI_GREEN_FOREGROUND
-#define ANSI_SUBMARINE_COLOR        ANSI_YELLOW_FOREGROUND
-#define ANSI_DESTROYER_COLOR        ANSI_MAGENTA_FOREGROUND
-
-#define PRINT_AIRCRAFT_CARRIER_WITH_COLOR ANSI_AIRCRAFT_CARRIER_COLOR << '#' << ANSI_RESET
-#define PRINT_BATTLESHIP_WITH_COLOR       ANSI_BATTLESHIP_COLOR       << '#' << ANSI_RESET
-#define PRINT_CRUISER_WITH_COLOR          ANSI_CRUISER_COLOR          << '#' << ANSI_RESET
-#define PRINT_SUBMARINE_WITH_COLOR        ANSI_SUBMARINE_COLOR        << '#' << ANSI_RESET
-#define PRINT_DESTROYER_WITH_COLOR        ANSI_DESTROYER_COLOR        << '#' << ANSI_RESET
+const static int BOARD_LENGTH = 10;
 
 enum Cell_State {
     Unmarked,
@@ -335,10 +323,10 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
 
     unsigned int center_row;
     unsigned int center_col;
-    bool orientation; // 0 is left-right, 1 is top-down
+    bool orientation; // 0 is horizontal, 1 is vertical
     unsigned int ship_cells_seen = 0;
-    for (size_t row = 0; row < BOARD_LENGTH; row++) {
-        for (size_t col = 0; col < BOARD_LENGTH; col++) {
+    for (int row = 0; row < BOARD_LENGTH; row++) {
+        for (int col = 0; col < BOARD_LENGTH; col++) {
             if (board[row][col] == ship_type) {
                 ship_cells_seen++;
                 if (ship_cells_seen == cells_until_center_of_rotation) {
@@ -594,8 +582,8 @@ bool are_all_ships_placed(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH])
     for (Cell_State ship : ships) {
         bool found = false;
 
-        for (size_t i = 0; i < BOARD_LENGTH && !found; i++) {
-            for (size_t j = 0; j < BOARD_LENGTH; j++) {
+        for (int i = 0; i < BOARD_LENGTH && !found; i++) {
+            for (int j = 0; j < BOARD_LENGTH; j++) {
                 if (board[i][j] == ship) {
                     found = true;
                     break;
