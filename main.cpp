@@ -28,7 +28,7 @@ enum Player {
     None,
     Player_1,
     Player_2,
-    Bot
+    //Bot
 };
 
 enum Menu {
