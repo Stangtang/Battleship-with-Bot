@@ -398,6 +398,59 @@ void move_ship(const int (&direction)[2], const Cell_State& ship_type, Cell_Stat
     }
 }
 
+void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+    unsigned int cells_until_center_of_rotation;
+    switch(ship_type) {
+        case Aircraft_Carrier: cells_until_center_of_rotation = 3; break;
+        case Battleship:       cells_until_center_of_rotation = 2; break;
+        case Cruiser:          cells_until_center_of_rotation = 2; break;
+        case Submarine:        cells_until_center_of_rotation = 2; break;
+        case Destroyer:        cells_until_center_of_rotation = 1; break;
+    }
+
+    unsigned int center_row;
+    unsigned int center_col;
+    bool orientation; // 0 is left-right, 1 is top-down
+    unsigned int ship_cells_seen = 0;
+    for (size_t row = 0; row < BOARD_LENGTH; row++) {
+        for (size_t col = 0; col < BOARD_LENGTH; col++) {
+            if (board[row][col] == ship_type) {
+                ship_cells_seen++;
+                if (ship_cells_seen == cells_until_center_of_rotation) {
+                    center_row = row;
+                    center_col = col;
+
+                    if (col == 0) {
+                        orientation = 1;
+                    } else if (board[row][col - 1] == board[row][col]) {
+                        orientation = 0;
+                    } else {
+                        orientation = 1;
+                    }
+                }
+            }   
+        }
+    }
+    
+    bool can_move = true;
+    switch(ship_type) {
+    case Aircraft_Carrier:
+        if (orientation == 0) {
+            if (center_col <= 1) {
+                
+            }
+            if (board[center_row - 1][center_col] ) {
+
+            }
+        }
+    break;
+        case Battleship:       cells_until_center_of_rotation = 2; break;
+        case Cruiser:          cells_until_center_of_rotation = 2; break;
+        case Submarine:        cells_until_center_of_rotation = 2; break;
+        case Destroyer:        cells_until_center_of_rotation = 1; break;
+    }
+}
+
 void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
     place_ship_randomly(ship_type, board);
 
@@ -436,6 +489,9 @@ void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][B
                 break;
             case Special_Key::Up_Arrow:
                 move_ship({-1, 0}, ship_type, board);
+                break;
+            case Special_Key::R:
+                rotate_ship(ship_type, board);
                 break;
         }
 
