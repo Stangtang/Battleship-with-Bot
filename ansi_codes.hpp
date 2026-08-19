@@ -1,3 +1,5 @@
+#pragma once
+
 #define ANSI_RESET "\e[0m"
 
 #define ANSI_CLEAR_TERMINAL "\e[2J\e[1;1H"

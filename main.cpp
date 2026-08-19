@@ -5,6 +5,7 @@
 #include <random>
 #include <stack>
 #include <utility>
+// #include <unordered_map>
 #include <vector>
 
 #include "input.hpp"
@@ -42,10 +43,19 @@ enum Menu {
 };
 
 std::stack<Menu> menu;
+// SAVE FOR LATER
+// std::unordered_map<Cell_State, std::vector<std::pair<int, int>>>
+//     player_one_ship_placements, player_two_ship_placements;
 Cell_State player_1_defending_board[BOARD_LENGTH][BOARD_LENGTH] = {};
 Cell_State player_2_defending_board[BOARD_LENGTH][BOARD_LENGTH] = {};
 Cell_State player_1_attacking_board[BOARD_LENGTH][BOARD_LENGTH] = {};
 Cell_State player_2_attacking_board[BOARD_LENGTH][BOARD_LENGTH] = {};
+std::random_device main_rd;
+
+// SAVE FOR LATER
+// void init_ship_placements(std::unordered_map<Cell_State, std::vector<std::pair<int, int>>> (&ship_placements)) {
+//   ship_placements.clear();
+// }
 
 void init_board(Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
     for (unsigned int i = 0; i < BOARD_LENGTH; i++) {
@@ -60,11 +70,10 @@ void clear_terminal() {
 }
 
 int get_random_number_inclusive(const int& bound_1, const int& bound_2) {
-    std::random_device rd;
     const int lower_bound = std::min(bound_1, bound_2);
     const int upper_bound = std::max(bound_1, bound_2);
     std::uniform_int_distribution<int> dist(lower_bound, upper_bound);
-    const int random_number = dist(rd);
+    const int random_number = dist(main_rd);
     return random_number;
 }
 
@@ -321,6 +330,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
         case Cruiser:          cells_until_center_of_rotation = 2; break;
         case Submarine:        cells_until_center_of_rotation = 2; break;
         case Destroyer:        cells_until_center_of_rotation = 1; break;
+        default: return;
     }
 
     unsigned int center_row;
@@ -445,6 +455,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
             }
         }
     break;
+    default: return;
     }
 
     if (!can_rotate) {
@@ -516,6 +527,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
             board[center_row][center_col + 1] = ship_type;
         }
     break;
+    default: return;
     }
 }
 
@@ -564,6 +576,7 @@ void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][B
             case Special_Key::R:
                 rotate_ship(ship_type, board);
                 break;
+            default: break;
         }
 
     } while(input != Special_Key::Enter);
