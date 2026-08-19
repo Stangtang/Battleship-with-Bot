@@ -84,9 +84,7 @@ std::uint8_t get_option_selected(const std::vector<std::string>& options) {
     do {
         key_pressed = get_keystroke();
     } while (!is_option_selection_input_valid(key_pressed, options.size()));
-
     const char key_pressed_char = static_cast<char>(key_pressed);
-
     return (key_pressed_char - '1' + 1);
 }
 
@@ -395,7 +393,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
             }
         }
     break;
-    case Cruiser: // same as submarine
+    case Cruiser:
     case Submarine:
         if (orientation == 0) {
             if (center_row <= 0 || center_row >= BOARD_LENGTH - 1) {
@@ -489,7 +487,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
             board[center_row][center_col + 2] = ship_type;
         }
     break;
-    case Cruiser: // same as submarine
+    case Cruiser:
     case Submarine:
         if (orientation == 0) {
             board[center_row][center_col - 1] = Unmarked;
@@ -563,7 +561,6 @@ void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][B
                 break;
             default: break;
         }
-
     } while(input != Special_Key::Enter);
 }
 
@@ -575,10 +572,8 @@ bool are_all_ships_placed(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH])
         Submarine,
         Destroyer
     };
-
     for (Cell_State ship : ships) {
         bool found = false;
-
         for (int i = 0; i < BOARD_LENGTH && !found; i++) {
             for (int j = 0; j < BOARD_LENGTH; j++) {
                 if (board[i][j] == ship) {
@@ -587,12 +582,10 @@ bool are_all_ships_placed(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH])
                 }
             }
         }
-
         if (!found) {
             return false;
         }
     }
-
     return true;
 }
 
@@ -600,7 +593,7 @@ void handle_player_1_ship_placement() {
     std::cout << "PLAYER 1, CHOOSE YOUR SHIP LAYOUT\n";
     std::cout << '\n';
 
-    const std::vector<std::string> options = { // There is a better way to align the strings but this will do
+    const std::vector<std::string> options = {
         "Place \e[0;31mAircraft Carrier\e[0m (Length 5)",
         "Place \e[0;36mBattleship\e[0m       (Length 4)",
         "Place \e[0;32mCruiser\e[0m          (Length 3)",
@@ -642,14 +635,13 @@ void handle_player_1_ship_placement() {
         case 6:
             init_board(player_1_defending_board);
             break;
-        case 7: // confirm layout
+        case 7:
             if (!are_all_ships_placed(player_1_defending_board)) {
                 std::cout << ANSI_RED_BACKGROUND << "\nCANNOT CONFIRM LAYOUT: NOT ALL SHIPS PLACED" << ANSI_RESET << '\n';
                 std::cout << "Press any key to continue\n";
                 get_keystroke();
                 break;
             }
-
             menu.pop();
             break;
         case 8:
@@ -663,7 +655,7 @@ void handle_player_2_ship_placement() {
     std::cout << "PLAYER 1 SHIP PLACEMENT CONFIRMED!\nPLAYER 2, CHOOSE YOUR SHIP LAYOUT\n";
     std::cout << '\n';
 
-    const std::vector<std::string> options = { // There is a better way to align the strings but this will do
+    const std::vector<std::string> options = {
         "Place \e[0;31mAircraft Carrier\e[0m (Length 5)",
         "Place \e[0;36mBattleship\e[0m       (Length 4)",
         "Place \e[0;32mCruiser\e[0m          (Length 3)",
@@ -705,14 +697,13 @@ void handle_player_2_ship_placement() {
         case 6:
             init_board(player_2_defending_board);
             break;
-        case 7: // confirm layout
+        case 7:
             if (!are_all_ships_placed(player_2_defending_board)) {
                 std::cout << ANSI_RED_BACKGROUND << "\nCANNOT CONFIRM LAYOUT: NOT ALL SHIPS PLACED" << ANSI_RESET << '\n';
                 std::cout << "Press any key to continue\n";
                 get_keystroke();
                 break;
             }
-
             menu.pop();
             break;
         case 8:
