@@ -603,11 +603,11 @@ void handle_play_against_human() {
     std::cout << '\n';
 
     const std::vector<std::string> options = { // There is a better way to align the strings but this will do
-        "Place Aircraft Carrier (Length 5)",
-        "Place Battleship       (Length 4)",
-        "Place Cruiser          (Length 3)",
-        "Place Submarine        (Length 3)",
-        "Place Destroyer        (Length 2)",
+        "Place \e[0;31mAircraft Carrier\e[0m (Length 5)",
+        "Place \e[0;36mBattleship\e[0m       (Length 4)",
+        "Place \e[0;32mCruiser\e[0m          (Length 3)",
+        "Place \e[0;33mSubmarine\e[0m        (Length 3)",
+        "Place \e[0;35mDestroyer\e[0m        (Length 2)",
         "Reset Layout",
         "Confirm Layout",
         "Back",
