@@ -147,7 +147,16 @@ void print_board(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
 }
 
 void print_ship_color_legend() {
-    std::cout << "Ship Color Legend:\n";
+    std::cout << "SHIP COLOR LEGEND\n";
+    std::cout << PRINT_AIRCRAFT_CARRIER_WITH_COLOR << " : Aircraft Carrier\n";
+    std::cout << PRINT_BATTLESHIP_WITH_COLOR << " : Battleship\n";
+    std::cout << PRINT_CRUISER_WITH_COLOR << " : Cruiser\n";
+    std::cout << PRINT_SUBMARINE_WITH_COLOR << " : Submarine\n";
+    std::cout << PRINT_DESTROYER_WITH_COLOR << " : Destroyer\n";
+}
+
+void print_enemy_seas_legend() { // WIP
+    // hit, miss, etc.
 }
 
 bool is_position_in_bounds(const int& row, const int& col) {
@@ -525,6 +534,9 @@ void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][B
         std::cout << "Enter      | Confirm\n";
         std::cout << '\n';
 
+        print_ship_color_legend();
+        std::cout << '\n';
+
         print_board(board);
 
         input = get_special_keystroke();
@@ -603,6 +615,9 @@ void handle_play_against_human() {
     print_options(options);
     std::cout << '\n';
 
+    print_ship_color_legend();
+    std::cout << '\n';
+    
     print_board(player_1_defending_board);
 
     switch(get_option_selected(options)) {
