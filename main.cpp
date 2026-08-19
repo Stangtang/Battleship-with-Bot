@@ -741,8 +741,27 @@ void handle_play_against_human() {
     }
 }
 
-void handle_player_versus_player_game() {
+Player get_first_player() {
+    std::cout << "Who Goes First?\n";
 
+    const std::vector<std::string> options = {
+        "Player 1",
+        "Player 2",
+    };
+    print_options(options);
+
+    switch(get_option_selected(options)) {
+        case 1: return Player_1;
+        case 2: return Player_2;
+    }
+}
+
+void handle_player_versus_player_game() {
+    if (curr_player == None) {
+        curr_player = get_first_player();
+        return;
+    }
+    
 }
 
 void handle_menu() {
