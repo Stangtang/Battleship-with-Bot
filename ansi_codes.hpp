@@ -1,0 +1,44 @@
+#define ANSI_RESET "\e[0m"
+
+#define ANSI_CLEAR_TERMINAL "\e[2J\e[1;1H"
+
+// Regular Foreground
+#define ANSI_BLACK_FOREGROUND   "\e[0;30m"
+#define ANSI_RED_FOREGROUND     "\e[0;31m"
+#define ANSI_GREEN_FOREGROUND   "\e[0;32m"
+#define ANSI_YELLOW_FOREGROUND  "\e[0;33m"
+#define ANSI_BLUE_FOREGROUND    "\e[0;34m"
+#define ANSI_MAGENTA_FOREGROUND "\e[0;35m"
+#define ANSI_CYAN_FOREGROUND    "\e[0;36m"
+#define ANSI_WHITE_FOREGROUND   "\e[0;37m"
+
+// Bright Foreground
+#define ANSI_BRIGHT_BLACK_FOREGROUND    "\e[0;90m"
+#define ANSI_BRIGHT_RED_FOREGROUND      "\e[0;91m"
+#define ANSI_BRIGHT_GREEN_FOREGROUND    "\e[0;92m"
+#define ANSI_BRIGHT_YELLOW_FOREGROUND   "\e[0;93m"
+#define ANSI_BRIGHT_BLUE_FOREGROUND     "\e[0;94m"
+#define ANSI_BRIGHT_MAGENTA_FOREGROUND  "\e[0;95m"
+#define ANSI_BRIGHT_CYAN_FOREGROUND     "\e[0;96m"
+#define ANSI_BRIGHT_WHITE_FOREGROUND    "\e[0;97m"
+
+// Regular Background
+#define ANSI_BLACK_BACKGROUND   "\e[40m"
+#define ANSI_RED_BACKGROUND     "\e[41m"
+#define ANSI_GREEN_BACKGROUND   "\e[42m"
+#define ANSI_YELLOW_BACKGROUND  "\e[43m"
+#define ANSI_BLUE_BACKGROUND    "\e[44m"
+#define ANSI_MAGENTA_BACKGROUND "\e[45m"
+#define ANSI_CYAN_BACKGROUND    "\e[46m"
+#define ANSI_WHITE_BACKGROUND   "\e[47m"
+
+// Bright Background
+#define ANSI_BRIGHT_BLACK_BACKGROUND    "\e[100m" // ???
+#define ANSI_BRIGHT_RED_BACKGROUND      "\e[101m"
+#define ANSI_BRIGHT_GREEN_BACKGROUND    "\e[102m"
+#define ANSI_BRIGHT_YELLOW_BACKGROUND   "\e[103m"
+#define ANSI_BRIGHT_BLUE_BACKGROUND     "\e[104m"
+#define ANSI_BRIGHT_MAGENTA_BACKGROUND  "\e[105m"
+#define ANSI_BRIGHT_CYAN_BACKGROUND     "\e[106m"
+#define ANSI_BRIGHT_WHITE_BACKGROUND    "\e[107m"
+
