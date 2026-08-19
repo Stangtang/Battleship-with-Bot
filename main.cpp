@@ -743,13 +743,11 @@ void handle_play_against_human() {
 
 Player get_first_player() {
     std::cout << "Who Goes First?\n";
-
     const std::vector<std::string> options = {
         "Player 1",
         "Player 2",
     };
     print_options(options);
-
     switch(get_option_selected(options)) {
         case 1: return Player_1;
         case 2: return Player_2;
@@ -761,7 +759,12 @@ void handle_player_versus_player_game() {
         curr_player = get_first_player();
         return;
     }
+
     
+
+
+
+
 }
 
 void handle_menu() {
@@ -790,10 +793,9 @@ void handle_menu() {
 }
 
 int main() {
-
     menu.push(Menu::Start);
-
     clear_terminal();
+
     while(true) {
         handle_menu();
         // check win? -- act no that will prolly happen somewhere else
