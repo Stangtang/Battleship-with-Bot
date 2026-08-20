@@ -149,8 +149,12 @@ void print_enemy_seas_legend() {
     std::cout << "X : Hit\n";
 }
 
+bool is_index_in_bounds(const int& index) {
+    return index >= 0 && index < BOARD_LENGTH;
+}
+
 bool is_position_in_bounds(const int& row, const int& col) {
-    return row >= 0 && row < BOARD_LENGTH && col >= 0 && col < BOARD_LENGTH;
+    return is_index_in_bounds(row) && is_index_in_bounds(col);
 }
 
 bool are_cell_and_neighbors_unmarked(const int& row, const int& col, const Cell_State (*board)[BOARD_LENGTH]) {
@@ -770,10 +774,6 @@ void print_attacking_board_with_selected_cell(Cell_State (*board)[BOARD_LENGTH],
     }
 }
 
-bool is_index_in_bounds(int index) {
-    return index >= 0 && index < BOARD_LENGTH;
-}
-
 void notify_move_selection_out_of_bounds() {
     std::cout << ANSI_RED_BACKGROUND << "\nCANNOT SELECT THERE: OUT OF BOUNDS" << ANSI_RESET << '\n';
     std::cout << "Press Any Key to Continue\n";
@@ -836,7 +836,7 @@ void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_
                 notify_move_selection_out_of_bounds();
                 break;
             case Enter: // validate
-            
+                
 
 
 
