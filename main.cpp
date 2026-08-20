@@ -350,20 +350,29 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
     unsigned int center_col;
     bool orientation; // 0 is horizontal, 1 is vertical
     unsigned int ship_cells_seen = 0;
-    for (unsigned int row = 0; row < BOARD_LENGTH; row++) {
+    bool center_found = false;
+    for (unsigned int row = 0; row < BOARD_LENGTH && !center_found; row++) {
         for (unsigned int col = 0; col < BOARD_LENGTH; col++) {
             if (board[row][col] == ship_type) {
                 ship_cells_seen++;
                 if (ship_cells_seen == cells_until_center_of_rotation) {
                     center_row = row;
                     center_col = col;
+                    center_found = true;
                     if (col == 0) {
                         orientation = 1;
-                    } else if (board[row][col - 1] == board[row][col]) {
-                        orientation = 0;
-                    } else {
-                        orientation = 1;
+                        break;
                     }
+                    if (col == BOARD_LENGTH - 1) {
+                        orientation = 1;
+                        break;
+                    }
+                    if (board[row][col - 1] == board[row][col] || board[row][col + 1] == board[row][col]) {
+                        orientation = 0;
+                        break;
+                    }
+                    orientation = 1;
+                    break;
                 }
             }   
         }
@@ -449,7 +458,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
     break;
     case Destroyer:
         if (orientation == 0) {
-            if (center_row >= BOARD_LENGTH - 1) {
+            if (center_row == BOARD_LENGTH - 1) {
                 can_rotate = false;
                 break;
             }
@@ -458,7 +467,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
                 break;
             }
         } else if (orientation == 1) {
-            if (center_col >= BOARD_LENGTH - 1) {
+            if (center_col == BOARD_LENGTH - 1) {
                 can_rotate = false;
                 break;
             }
@@ -568,11 +577,9 @@ void place_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH]) 
         print_board(board);
 
         input = get_special_keystroke();
-
         switch(input) {
             case Special_Key::Not_Recognized:
                 continue;
-                break;
             case Special_Key::Escape:
                 init_board(board);
                 place_ship_randomly(ship_type, board);
@@ -629,11 +636,11 @@ void handle_play_against_human_ship_placement() {
     std::cout << '\n';
 
     const std::vector<std::string> options = {
-        "Place \e[0;31mAircraft Carrier\e[0m (Length 5)",
-        "Place \e[0;36mBattleship\e[0m       (Length 4)",
-        "Place \e[0;32mCruiser\e[0m          (Length 3)",
-        "Place \e[0;33mSubmarine\e[0m        (Length 3)",
-        "Place \e[0;35mDestroyer\e[0m        (Length 2)",
+        "Place " + std::string(ANSI_AIRCRAFT_CARRIER_COLOR) + "Aircraft Carrier\e[0m (Length 5)",
+        "Place " + std::string(ANSI_BATTLESHIP_COLOR) + "Battleship\e[0m       (Length 4)",
+        "Place " + std::string(ANSI_CRUISER_COLOR) + "Cruiser\e[0m          (Length 3)",
+        "Place " + std::string(ANSI_SUBMARINE_COLOR) + "Submarine\e[0m        (Length 3)",
+        "Place " + std::string(ANSI_DESTROYER_COLOR) + "Destroyer\e[0m        (Length 2)",
         "Reset Layout",
         "Confirm Layout",
         "Back",
@@ -767,15 +774,59 @@ void view_your_seas(const Cell_State (*curr_player_defending_board)[BOARD_LENGTH
     }
 }
 
+void print_attacking_board_with_selected_cell(Cell_State (*board)[BOARD_LENGTH], unsigned int selected_row, unsigned int selected_col) {
+    for (unsigned int row = 0; row < BOARD_LENGTH; row++) {
+        for (unsigned int col = 0; col < BOARD_LENGTH; col++) {
+            if (row == selected_row && col == selected_col) {
+                std::cout << HIGHLIGHT_SELECTED_CELL_BACKGROUND_COLOR;
+            }
+            switch(board[row][col]) {
+            case Cell_State::Unmarked:
+                std::cout << '-';
+                break;
+            case Cell_State::Miss:
+                std::cout << 'O';
+                break;
+            case Cell_State::Hit:
+                std::cout << 'X';
+                break;
+            }
+            std::cout << ANSI_RESET << ' ';
+        }
+        std::cout << '\n';
+    }
+}
+
 void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_State (*enemy_player_defending_board)[BOARD_LENGTH], const std::string& enemy_player_text) {
+    unsigned int selected_row = get_random_number_inclusive(0, BOARD_LENGTH - 1);
+    unsigned int selected_col = get_random_number_inclusive(0, BOARD_LENGTH - 1);
+
+    Special_Key input;
+    do {
+        clear_terminal();
         std::cout << "ATTACKING ENEMY (" << to_upper(enemy_player_text) << "'S) SEAS\n";
         std::cout << '\n';
 
         std::cout << "Arrow Keys | Change Selected Cell\n";
         std::cout << "Enter      | Confirm\n";
+        std::cout << "Escape     | Back\n";
         std::cout << '\n';
 
-        
+        std::cout << HIGHLIGHT_SELECTED_CELL_BACKGROUND_COLOR << ' ' << ANSI_RESET << " : Selected Cell\n";
+        std::cout << '\n';
+
+        print_attacking_board_with_selected_cell(curr_player_attacking_board, selected_row, selected_col);
+
+        input = get_special_keystroke();
+        switch(input) {
+            case Not_Recognized: 
+                continue;
+            case Escape:
+                return;
+
+        }
+    } while(input != Enter);
+
 }
 
 void handle_player_versus_player_game() {
@@ -830,7 +881,7 @@ void handle_player_versus_player_game() {
             view_your_seas(curr_player_defending_board, curr_player_text);
             return;
         case 3:
-            
+            attack(curr_player_attacking_board, enemy_player_defending_board, enemy_player_text);
 
 
 
