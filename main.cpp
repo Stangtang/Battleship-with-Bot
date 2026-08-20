@@ -835,15 +835,27 @@ void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_
                 }
                 notify_move_selection_out_of_bounds();
                 break;
-            case Enter: // validate
-                
+            case Enter:
+                if (curr_player_attacking_board[selected_row][selected_col] != Unmarked) {
+                    std::string cell_state_text;
+                    if (curr_player_attacking_board[selected_row][selected_col] == Hit) {
+                        cell_state_text = "HIT";
+                    } else if (curr_player_attacking_board[selected_row][selected_col] == Miss) {
+                        cell_state_text = "MISS";
+                    }
+                    std::cout << ANSI_RED_BACKGROUND << "\nCANNOT ATTACK THERE: ALREADY A " << cell_state_text << ANSI_RESET << '\n';
+                    std::cout << "Press Any Key to Continue\n";
+                    get_keystroke();
+                    break;
+                }
 
-
-
-
+                cell_selected = true;
                 break;
         }
     } while(!cell_selected);
+
+    // cell has been selected, handle attacking selected cell
+
 
 }
 
