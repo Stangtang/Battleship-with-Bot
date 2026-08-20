@@ -36,6 +36,7 @@ enum Menu {
     Play_Against_Human,
     Player_1_Ship_Placement,
     Player_2_Ship_Placement,
+    Play_Against_Human_Ship_Placement,
     Player_Versus_Player_Game,
     Play_Against_Bot,
 };
@@ -56,7 +57,7 @@ std::random_device main_rd;
 //   ship_placements.clear();
 // }
 
-void init_board(Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+void init_board(Cell_State (*board)[BOARD_LENGTH]) {
     for (unsigned int i = 0; i < BOARD_LENGTH; i++) {
         for (unsigned int j = 0; j < BOARD_LENGTH; j++) {
             board[i][j] = Cell_State::Unmarked;
@@ -183,7 +184,7 @@ bool is_position_in_bounds(const int& row, const int& col) {
     return row >= 0 && row < BOARD_LENGTH && col >= 0 && col < BOARD_LENGTH;
 }
 
-bool are_cell_and_neighbors_unmarked(const int& row, const int& col, const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+bool are_cell_and_neighbors_unmarked(const int& row, const int& col, const Cell_State (*board)[BOARD_LENGTH]) {
     for (int i = row - 1; i <= row + 1; i++) {
         for (int j = col - 1; j <= col + 1; j++) {
             if (board[i][j] != Cell_State::Unmarked || !is_position_in_bounds(row, col)) {
@@ -194,7 +195,7 @@ bool are_cell_and_neighbors_unmarked(const int& row, const int& col, const Cell_
     return true;
 }
 
-void remove_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) { 
+void remove_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH]) { 
     for (unsigned int i = 0; i < BOARD_LENGTH; i++) {
         for (unsigned int j = 0; j < BOARD_LENGTH; j++) {
             if (board[i][j] == ship_type) {
@@ -204,7 +205,7 @@ void remove_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
     }
 };
 
-void place_ship_randomly(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+void place_ship_randomly(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH]) {
     unsigned int ship_length;
     switch (ship_type) {
     case Cell_State::Aircraft_Carrier: ship_length = 5; break;
@@ -286,7 +287,7 @@ std::string get_player_text(const Player& player) {
     }
 }
 
-void move_ship(const int (&direction)[2], const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+void move_ship(const int (&direction)[2], const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH]) {
     const int delta_row = direction[0];
     const int delta_col = direction[1];
 
@@ -338,7 +339,7 @@ void move_ship(const int (&direction)[2], const Cell_State& ship_type, Cell_Stat
     }
 }
 
-void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH]) {
     unsigned int cells_until_center_of_rotation;
     switch(ship_type) {
         case Aircraft_Carrier: cells_until_center_of_rotation = 3; break;
@@ -547,7 +548,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][
     }
 }
 
-void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+void place_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH]) {
     place_ship_randomly(ship_type, board);
 
     const std::string ship_name = get_ship_text(ship_type);
@@ -600,7 +601,7 @@ void place_ship(const Cell_State& ship_type, Cell_State (&board)[BOARD_LENGTH][B
     } while(input != Special_Key::Enter);
 }
 
-bool are_all_ships_placed(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH]) {
+bool are_all_ships_placed(const Cell_State (*board)[BOARD_LENGTH]) {
     const Cell_State ships[] = {
         Aircraft_Carrier,
         Battleship,
@@ -623,6 +624,80 @@ bool are_all_ships_placed(const Cell_State (&board)[BOARD_LENGTH][BOARD_LENGTH])
         }
     }
     return true;
+}
+
+void handle_play_against_human_ship_placement() {
+    const std::string curr_player_text = get_player_text(curr_player);
+
+    std::cout << to_upper(curr_player_text) << ", CHOOSE YOUR SHIP LAYOUT\n";
+    std::cout << '\n';
+
+    const std::vector<std::string> options = {
+        "Place \e[0;31mAircraft Carrier\e[0m (Length 5)",
+        "Place \e[0;36mBattleship\e[0m       (Length 4)",
+        "Place \e[0;32mCruiser\e[0m          (Length 3)",
+        "Place \e[0;33mSubmarine\e[0m        (Length 3)",
+        "Place \e[0;35mDestroyer\e[0m        (Length 2)",
+        "Reset Layout",
+        "Confirm Layout",
+        "Back",
+    };
+    print_options(options);
+    std::cout << '\n';
+
+    print_ship_color_legend();
+    std::cout << '\n';
+
+    Cell_State (*curr_player_defending_board)[BOARD_LENGTH];
+    switch (curr_player) {
+        case Player_1:
+            curr_player_defending_board = player_1_defending_board;
+            break;
+        case Player_2:
+            curr_player_defending_board = player_2_defending_board;
+            break;
+    }
+
+    print_board(curr_player_defending_board);
+
+    switch(get_option_selected(options)) {
+        case 1:
+            remove_ship(Aircraft_Carrier, curr_player_defending_board);
+            place_ship(Aircraft_Carrier, curr_player_defending_board);
+            break;
+        case 2:
+            remove_ship(Battleship, curr_player_defending_board);
+            place_ship(Battleship, curr_player_defending_board);
+            break;
+        case 3:
+            remove_ship(Cruiser, curr_player_defending_board);
+            place_ship(Cruiser, curr_player_defending_board);
+            break;
+        case 4:
+            remove_ship(Submarine, curr_player_defending_board);
+            place_ship(Submarine, curr_player_defending_board);
+            break;
+        case 5:
+            remove_ship(Destroyer, curr_player_defending_board);
+            place_ship(Destroyer, curr_player_defending_board);
+            break;
+        case 6:
+            init_board(curr_player_defending_board);
+            break;
+        case 7:
+            if (!are_all_ships_placed(curr_player_defending_board)) {
+                std::cout << ANSI_RED_BACKGROUND << "\nCANNOT CONFIRM LAYOUT: NOT ALL SHIPS PLACED" << ANSI_RESET << '\n';
+                std::cout << "Press any key to continue\n";
+                get_keystroke();
+                break;
+            }
+            menu.pop();
+            break;
+        case 8:
+            init_board(curr_player_defending_board);
+            menu.pop();
+            break;
+    }
 }
 
 void handle_player_1_ship_placement() {
