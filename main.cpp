@@ -770,10 +770,21 @@ void print_attacking_board_with_selected_cell(Cell_State (*board)[BOARD_LENGTH],
     }
 }
 
+bool is_index_in_bounds(int index) {
+    return index >= 0 && index < BOARD_LENGTH;
+}
+
+void notify_move_selection_out_of_bounds() {
+    std::cout << ANSI_RED_BACKGROUND << "\nCANNOT SELECT THERE: OUT OF BOUNDS" << ANSI_RESET << '\n';
+    std::cout << "Press Any Key to Continue\n";
+    get_keystroke();
+}
+
 void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_State (*enemy_player_defending_board)[BOARD_LENGTH], const std::string& enemy_player_text) {
     unsigned int selected_row = get_random_number_inclusive(0, BOARD_LENGTH - 1);
     unsigned int selected_col = get_random_number_inclusive(0, BOARD_LENGTH - 1);
 
+    bool cell_selected = false;
     Special_Key input;
     do {
         clear_terminal();
@@ -796,9 +807,43 @@ void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_
                 continue;
             case Escape:
                 return;
+            case Right_Arrow:
+                if (is_index_in_bounds(selected_col + 1)) {
+                    selected_col++;
+                    break;
+                }
+                notify_move_selection_out_of_bounds();
+                break;
+            case Left_Arrow:
+                if (is_index_in_bounds(selected_col - 1)) {
+                    selected_col--;
+                    break;
+                }
+                notify_move_selection_out_of_bounds();
+                break;
+            case Down_Arrow:
+                if (is_index_in_bounds(selected_row + 1)) {
+                    selected_row++;
+                    break;
+                }
+                notify_move_selection_out_of_bounds();
+                break;
+            case Up_Arrow:
+                if (is_index_in_bounds(selected_row - 1)) {
+                    selected_row--;
+                    break;
+                }
+                notify_move_selection_out_of_bounds();
+                break;
+            case Enter: // validate
+            
 
+
+
+
+                break;
         }
-    } while(input != Enter);
+    } while(!cell_selected);
 
 }
 
