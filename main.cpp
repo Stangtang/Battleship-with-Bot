@@ -309,7 +309,7 @@ void move_ship(const int (&direction)[2], const Cell_State& ship_type, Cell_Stat
 
     if (!can_move) {
         std::cout << ANSI_RED_BACKGROUND << "\nCANNOT MOVE THERE" << ANSI_RESET << '\n';
-        std::cout << "Press any key to continue\n";
+        std::cout << "Press Any Key to Continue\n";
         get_keystroke();
         return;
     }
@@ -473,7 +473,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
 
     if (!can_rotate) {
         std::cout << ANSI_RED_BACKGROUND << "\nCANNOT ROTATE THERE" << ANSI_RESET << '\n';
-        std::cout << "Press any key to continue\n";
+        std::cout << "Press Any Key to Continue\n";
         get_keystroke();
         return;
     }
@@ -556,9 +556,9 @@ void place_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH]) 
         std::cout << "PLACING " << to_upper(ship_name) << " FOR " << to_upper(get_player_text(curr_player)) << "\n";
         std::cout << '\n';
 
-        std::cout << "Arrow Keys | Change position of " << ship_name << '\n'; // Manual alignment will do
+        std::cout << "Arrow Keys | Change Position of " << ship_name << '\n';
         std::cout << "R          | Rotate " << ship_name << '\n';
-        std::cout << "Escape     | Reset layout\n";
+        std::cout << "Escape     | Reset Layout\n";
         std::cout << "Enter      | Confirm\n";
         std::cout << '\n';
 
@@ -683,7 +683,7 @@ void handle_play_against_human_ship_placement() {
         case 7:
             if (!are_all_ships_placed(curr_player_defending_board)) {
                 std::cout << ANSI_RED_BACKGROUND << "\nCANNOT CONFIRM LAYOUT: NOT ALL SHIPS PLACED" << ANSI_RESET << '\n';
-                std::cout << "Press any key to continue\n";
+                std::cout << "Press Any Key to Continue\n";
                 get_keystroke();
                 break;
             }
@@ -767,15 +767,15 @@ void view_your_seas(const Cell_State (*curr_player_defending_board)[BOARD_LENGTH
     }
 }
 
-void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], Cell_State (*enemy_player_defending_board)[BOARD_LENGTH]) {
-        // std::cout << "ATTACKING\n";
-        // std::cout << '\n';
+void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_State (*enemy_player_defending_board)[BOARD_LENGTH], const std::string& enemy_player_text) {
+        std::cout << "ATTACKING ENEMY (" << to_upper(enemy_player_text) << "'S) SEAS\n";
+        std::cout << '\n';
 
-        // std::cout << "Arrow Keys | Change position of " << ship_name << '\n'; // Manual alignment will do
-        // std::cout << "R          | Rotate " << ship_name << '\n';
-        // std::cout << "Escape     | Reset layout\n";
-        // std::cout << "Enter      | Confirm\n";
-        // std::cout << '\n';
+        std::cout << "Arrow Keys | Change Selected Cell\n";
+        std::cout << "Enter      | Confirm\n";
+        std::cout << '\n';
+
+        
 }
 
 void handle_player_versus_player_game() {
