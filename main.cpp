@@ -34,8 +34,6 @@ enum Player {
 enum Menu {
     Start,
     Play_Against_Human,
-    Player_1_Ship_Placement,
-    Player_2_Ship_Placement,
     Play_Against_Human_Ship_Placement,
     Player_Versus_Player_Game,
     Play_Against_Bot,
@@ -828,10 +826,10 @@ void handle_player_2_ship_placement() {
 void handle_play_against_human() {
     if (!are_all_ships_placed(player_1_defending_board)) {
         curr_player = Player_1;
-        menu.push(Menu::Player_1_Ship_Placement);
+        menu.push(Menu::Play_Against_Human_Ship_Placement);
     } else if (!are_all_ships_placed(player_2_defending_board)) {
         curr_player = Player_2;
-        menu.push(Menu::Player_2_Ship_Placement);
+        menu.push(Menu::Play_Against_Human_Ship_Placement);
     } else {
         curr_player = None;
         menu.push(Menu::Player_Versus_Player_Game);
@@ -962,11 +960,8 @@ void handle_menu() {
     case Play_Against_Human:
         handle_play_against_human();
         break;
-    case Player_1_Ship_Placement:
-        handle_player_1_ship_placement();
-        break;
-    case Player_2_Ship_Placement:
-        handle_player_2_ship_placement();
+    case Play_Against_Human_Ship_Placement:
+        handle_play_against_human_ship_placement();
         break;
     case Player_Versus_Player_Game:
         handle_player_versus_player_game();
