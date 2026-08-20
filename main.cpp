@@ -867,9 +867,10 @@ void handle_player_versus_player_game() {
             view_your_seas(curr_player_defending_board);
             return;
         case 3: // attack
+            
 
 
-        
+
             break; // or return idk
     }
 
