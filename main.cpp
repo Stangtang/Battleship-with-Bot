@@ -723,10 +723,10 @@ Player get_first_player() {
     }
 }
 
-void view_enemy_seas(const Cell_State (*curr_player_attacking_board)[BOARD_LENGTH]) {
+void view_enemy_seas(const Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const std::string& enemy_player_text) {
     clear_terminal();
 
-    std::cout << "VIEWING ENEMY SEAS\n";
+    std::cout << "VIEWING ENEMY (" << to_upper(enemy_player_text) << "'S) SEAS\n";
     std::cout << '\n';
     
     const std::vector<std::string> options = {
@@ -745,10 +745,10 @@ void view_enemy_seas(const Cell_State (*curr_player_attacking_board)[BOARD_LENGT
     }
 }
 
-void view_your_seas(const Cell_State (*curr_player_defending_board)[BOARD_LENGTH]) {
+void view_your_seas(const Cell_State (*curr_player_defending_board)[BOARD_LENGTH], const std::string curr_player_text) {
     clear_terminal();
 
-    std::cout << "VIEWING YOUR SEAS\n";
+    std::cout << "VIEWING YOUR (" << to_upper(curr_player_text) << "'S) SEAS\n";
     std::cout << '\n';
     
     const std::vector<std::string> options = {
@@ -768,7 +768,14 @@ void view_your_seas(const Cell_State (*curr_player_defending_board)[BOARD_LENGTH
 }
 
 void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], Cell_State (*enemy_player_defending_board)[BOARD_LENGTH]) {
-    
+        // std::cout << "ATTACKING\n";
+        // std::cout << '\n';
+
+        // std::cout << "Arrow Keys | Change position of " << ship_name << '\n'; // Manual alignment will do
+        // std::cout << "R          | Rotate " << ship_name << '\n';
+        // std::cout << "Escape     | Reset layout\n";
+        // std::cout << "Enter      | Confirm\n";
+        // std::cout << '\n';
 }
 
 void handle_player_versus_player_game() {
@@ -778,6 +785,7 @@ void handle_player_versus_player_game() {
     }
 
     const std::string curr_player_text = get_player_text(curr_player);
+    std::string enemy_player_text;
     Cell_State (*curr_player_defending_board)[BOARD_LENGTH];
     Cell_State (*curr_player_attacking_board)[BOARD_LENGTH];
     Cell_State (*enemy_player_defending_board)[BOARD_LENGTH];
@@ -786,20 +794,22 @@ void handle_player_versus_player_game() {
             curr_player_defending_board = player_1_defending_board;
             curr_player_attacking_board = player_1_attacking_board;
             enemy_player_defending_board = player_2_defending_board;
+            enemy_player_text = get_player_text(Player_2);
             break;
         case Player_2:
             curr_player_defending_board = player_2_defending_board;
             curr_player_attacking_board = player_2_attacking_board;
             enemy_player_defending_board = player_1_defending_board;
+            enemy_player_text = get_player_text(Player_1);
             break;
     }
 
-    std::cout << to_upper(get_player_text(curr_player)) << "'S TURN\n";
+    std::cout << to_upper(curr_player_text) << "'S TURN\n";
     std::cout << '\n';
 
     const std::vector<std::string> options = {
-        "View Enemy Seas",
-        "View Your Seas",
+        "View Enemy (" + enemy_player_text + "'s) Seas",
+        "View Your (" + curr_player_text + "'s) Seas",
         "Attack",
     };
     print_options(options);
@@ -814,10 +824,10 @@ void handle_player_versus_player_game() {
 
     switch(get_option_selected(options)) {
         case 1:
-            view_enemy_seas(curr_player_attacking_board);
+            view_enemy_seas(curr_player_attacking_board, enemy_player_text);
             return;
         case 2:
-            view_your_seas(curr_player_defending_board);
+            view_your_seas(curr_player_defending_board, curr_player_text);
             return;
         case 3:
             
