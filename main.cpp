@@ -710,6 +710,7 @@ void handle_play_against_human() {
 }
 
 Player get_first_player() {
+    std::cout << "SHIP PLACEMENT COMPLETE\n\n";
     std::cout << "Who Goes First?\n";
     const std::vector<std::string> options = {
         "Player 1",
@@ -766,6 +767,10 @@ void view_your_seas(const Cell_State (*curr_player_defending_board)[BOARD_LENGTH
     }
 }
 
+void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], Cell_State (*enemy_player_defending_board)[BOARD_LENGTH]) {
+    
+}
+
 void handle_player_versus_player_game() {
     if (curr_player == None) {
         curr_player = get_first_player();
@@ -814,7 +819,7 @@ void handle_player_versus_player_game() {
         case 2:
             view_your_seas(curr_player_defending_board);
             return;
-        case 3: // attack
+        case 3:
             
 
 
