@@ -860,7 +860,7 @@ void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_
         clear_terminal();
         std::cout << "ENEMY (" << to_upper(enemy_player_text) << "'S) SEAS\n";
         print_board(curr_player_attacking_board);
-        std::cout << ANSI_BRIGHT_BLUE_BACKGROUND << "\nIT WAS A MISS!" << ANSI_RESET << '\n';
+        std::cout << ANSI_BRIGHT_BLUE_FOREGROUND << "\nIT WAS A MISS!" << ANSI_RESET << '\n';
         std::cout << "Press Any Key to Continue\n";
         get_keystroke();
 
@@ -882,8 +882,7 @@ void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_
     std::cout << "Press Any Key to Continue\n";
     get_keystroke();
 
-
-    // check win
+    
 }
 
 void handle_player_versus_player_game() {
