@@ -145,8 +145,8 @@ void print_ship_color_legend() {
 void print_enemy_seas_legend() {
     std::cout << "ENEMY SEAS LEGEND\n";
     std::cout << "- : Unmarked\n";
-    std::cout << "O : Miss\n";
     std::cout << "X : Hit\n";
+    std::cout << "O : Miss\n";
 }
 
 bool is_index_in_bounds(const int& index) {
@@ -707,7 +707,87 @@ Player get_first_player() {
     }
 }
 
-void view_enemy_seas(const Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const std::string& enemy_player_text) {
+void print_attacking_board_with_selected_cell(const Cell_State (*attacking_board)[BOARD_LENGTH], const Cell_State (*defending_board)[BOARD_LENGTH], const int& selected_row, const int& selected_col, bool print_legend = false) {
+    unsigned int aircraft_carrier_cells_hit = 0;
+    unsigned int battleship_cells_hit = 0;
+    unsigned int cruiser_cells_hit = 0;
+    unsigned int submarine_cells_hit = 0;
+    unsigned int destroyer_cells_hit = 0;
+    
+    for (unsigned int row = 0; row < BOARD_LENGTH; row++) {
+        for (unsigned int col = 0; col < BOARD_LENGTH; col++) {
+            if (attacking_board[row][col] == Hit) {
+                switch(defending_board[row][col]) {
+                    case Aircraft_Carrier: aircraft_carrier_cells_hit++; break;
+                    case Battleship: battleship_cells_hit++; break;
+                    case Cruiser: cruiser_cells_hit++; break;
+                    case Submarine: submarine_cells_hit++; break;
+                    case Destroyer: destroyer_cells_hit++; break;
+                }
+            }
+        }
+    }
+
+    if (print_legend) {
+        if (aircraft_carrier_cells_hit == 5) {
+            std::cout << ANSI_AIRCRAFT_CARRIER_COLOR << 'X' << ANSI_RESET << " : Sunken Aircraft Carrier\n";
+        }
+        if (battleship_cells_hit == 4) {
+            std::cout << ANSI_BATTLESHIP_COLOR << 'X' << ANSI_RESET << " : Sunken Battleship\n";
+        }
+        if (cruiser_cells_hit == 3) {
+            std::cout << ANSI_CRUISER_COLOR << 'X' << ANSI_RESET << " : Sunken Cruiser\n";
+        }
+        if (submarine_cells_hit == 3) {
+            std::cout << ANSI_SUBMARINE_COLOR << 'X' << ANSI_RESET << " : Sunken Submarine\n";
+        }
+        if (destroyer_cells_hit == 2) {
+            std::cout << ANSI_DESTROYER_COLOR << 'X' << ANSI_RESET << " : Sunken Destroyer\n";
+        }
+        std::cout << '\n';
+    }
+
+    for (unsigned int row = 0; row < BOARD_LENGTH; row++) {
+        for (unsigned int col = 0; col < BOARD_LENGTH; col++) {
+            if (row == selected_row && col == selected_col) {
+                std::cout << HIGHLIGHT_SELECTED_CELL_BACKGROUND_COLOR;
+            }
+            switch(attacking_board[row][col]) {
+            case Cell_State::Unmarked:
+                std::cout << '-';
+                break;
+            case Cell_State::Miss:
+                std::cout << 'O';
+                break;
+            case Cell_State::Hit:
+                if (defending_board[row][col] == Aircraft_Carrier && aircraft_carrier_cells_hit == 5) {
+                    std::cout << ANSI_AIRCRAFT_CARRIER_COLOR;
+                }
+                if (defending_board[row][col] == Battleship && battleship_cells_hit == 4) {
+                    std::cout << ANSI_BATTLESHIP_COLOR;
+                }
+                if (defending_board[row][col] == Cruiser && cruiser_cells_hit == 3) {
+                    std::cout << ANSI_CRUISER_COLOR;
+                }
+                if (defending_board[row][col] == Submarine && submarine_cells_hit == 3) {
+                    std::cout << ANSI_SUBMARINE_COLOR;
+                }
+                if (defending_board[row][col] == Destroyer && destroyer_cells_hit == 2) {
+                    std::cout << ANSI_DESTROYER_COLOR;
+                }
+                if (row == selected_row && col == selected_col) {
+                    std::cout << HIGHLIGHT_SELECTED_CELL_BACKGROUND_COLOR;
+                }
+                std::cout << 'X';
+                break;
+            }
+            std::cout << ANSI_RESET << ' ';
+        }
+        std::cout << '\n';
+    }
+}
+
+void view_enemy_seas(const Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_State (*enemy_player_defending_board)[BOARD_LENGTH], const std::string& enemy_player_text) {
     clear_terminal();
 
     std::cout << "VIEWING ENEMY (" << to_upper(enemy_player_text) << "'S) SEAS\n";
@@ -722,7 +802,7 @@ void view_enemy_seas(const Cell_State (*curr_player_attacking_board)[BOARD_LENGT
     print_enemy_seas_legend();
     std::cout << '\n';
     std::cout << "ENEMY SEAS\n";
-    print_board(curr_player_attacking_board);
+    print_attacking_board_with_selected_cell(curr_player_attacking_board, enemy_player_defending_board, -1, -1);
 
     switch (get_option_selected(options)) {
     case 1: return;
@@ -751,29 +831,6 @@ void view_your_seas(const Cell_State (*curr_player_defending_board)[BOARD_LENGTH
     }
 }
 
-void print_attacking_board_with_selected_cell(Cell_State (*board)[BOARD_LENGTH], const int& selected_row, const int& selected_col) {
-    for (unsigned int row = 0; row < BOARD_LENGTH; row++) {
-        for (unsigned int col = 0; col < BOARD_LENGTH; col++) {
-            if (row == selected_row && col == selected_col) {
-                std::cout << HIGHLIGHT_SELECTED_CELL_BACKGROUND_COLOR;
-            }
-            switch(board[row][col]) {
-            case Cell_State::Unmarked:
-                std::cout << '-';
-                break;
-            case Cell_State::Miss:
-                std::cout << 'O';
-                break;
-            case Cell_State::Hit:
-                std::cout << 'X';
-                break;
-            }
-            std::cout << ANSI_RESET << ' ';
-        }
-        std::cout << '\n';
-    }
-}
-
 void notify_move_selection_out_of_bounds() {
     std::cout << ANSI_RED_BACKGROUND << "\nCANNOT SELECT THERE: OUT OF BOUNDS" << ANSI_RESET << '\n';
     std::cout << "Press Any Key to Continue\n";
@@ -782,7 +839,7 @@ void notify_move_selection_out_of_bounds() {
 
 void print_player_1_winscreen_boards() {
     std::cout << "PLAYER 1'S ATTACKS\n";
-    print_attacking_board_with_selected_cell(player_1_attacking_board, -1, -1);
+    print_attacking_board_with_selected_cell(player_1_attacking_board, player_2_defending_board, -1, -1);
     std::cout << '\n';
     std::cout << "PLAYER 1'S SHIP LAYOUT\n";
     print_board(player_1_defending_board);
@@ -790,7 +847,7 @@ void print_player_1_winscreen_boards() {
 
 void print_player_2_winscreen_boards() {
     std::cout << "PLAYER 2'S ATTACKS\n";
-    print_attacking_board_with_selected_cell(player_2_attacking_board, -1, -1);
+    print_attacking_board_with_selected_cell(player_2_attacking_board, player_1_defending_board, -1, -1);
     std::cout << '\n';
     std::cout << "PLAYER 2'S SHIP LAYOUT\n";
     print_board(player_2_defending_board);
@@ -846,7 +903,7 @@ void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_
         std::cout << HIGHLIGHT_SELECTED_CELL_BACKGROUND_COLOR << ' ' << ANSI_RESET << " : Selected Cell\n";
         std::cout << '\n';
 
-        print_attacking_board_with_selected_cell(curr_player_attacking_board, selected_row, selected_col);
+        print_attacking_board_with_selected_cell(curr_player_attacking_board, enemy_player_defending_board, selected_row, selected_col, true);
 
         input = get_special_keystroke();
         switch(input) {
@@ -906,7 +963,7 @@ void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_
         
         clear_terminal();
         std::cout << "ENEMY (" << to_upper(enemy_player_text) << "'S) SEAS\n";
-        print_board(curr_player_attacking_board);
+        print_attacking_board_with_selected_cell(curr_player_attacking_board, enemy_player_defending_board, selected_row, selected_col);
         std::cout << ANSI_BRIGHT_BLUE_FOREGROUND << "\nIT WAS A MISS!" << ANSI_RESET << '\n';
         std::cout << "Press Any Key to Continue\n";
         get_keystroke();
@@ -924,7 +981,7 @@ void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_
 
     clear_terminal();
     std::cout << "ENEMY (" << to_upper(enemy_player_text) << "'S) SEAS\n";
-    print_board(curr_player_attacking_board);
+    print_attacking_board_with_selected_cell(curr_player_attacking_board, enemy_player_defending_board, selected_row , selected_col);
     std::cout << ANSI_LIGHT_GREEN_FOREGROUND << "\nIT WAS A HIT!" << ANSI_RESET << '\n';
     std::cout << "Press Any Key to Continue\n";
     get_keystroke();
@@ -993,7 +1050,7 @@ void handle_player_versus_player_game() {
     std::cout << '\n';
 
     std::cout << "ENEMY SEAS\n";
-    print_board(curr_player_attacking_board);
+    print_attacking_board_with_selected_cell(curr_player_attacking_board, enemy_player_defending_board, -1, -1);
     std::cout << '\n';
     
     std::cout << "YOUR SEAS\n";
@@ -1001,7 +1058,7 @@ void handle_player_versus_player_game() {
 
     switch(get_option_selected(options)) {
         case 1:
-            view_enemy_seas(curr_player_attacking_board, enemy_player_text);
+            view_enemy_seas(curr_player_attacking_board, enemy_player_defending_board, enemy_player_text);
             return;
         case 2:
             view_your_seas(curr_player_defending_board, curr_player_text);
