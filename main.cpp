@@ -854,8 +854,33 @@ void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_
         }
     } while(!cell_selected);
 
-    // cell has been selected, handle attacking selected cell
+    if (enemy_player_defending_board[selected_row][selected_col] == Unmarked) {
+        curr_player_attacking_board[selected_row][selected_col] = Miss;
+        
+        clear_terminal();
+        std::cout << "ENEMY (" << to_upper(enemy_player_text) << "'S) SEAS\n";
+        print_board(curr_player_attacking_board);
+        std::cout << ANSI_BRIGHT_BLUE_BACKGROUND << "\nIT WAS A MISS! " << ANSI_RESET << '\n';
+        std::cout << "Press Any Key to Continue\n";
+        get_keystroke();
 
+        if (curr_player == Player_1) {
+            curr_player = Player_2;
+        } else {
+            curr_player = Player_1;
+        }
+
+        return;
+    }
+
+    curr_player_attacking_board[selected_row][selected_col] = Hit;
+
+    clear_terminal();
+    std::cout << "ENEMY (" << to_upper(enemy_player_text) << "'S) SEAS\n";
+    print_board(curr_player_attacking_board);
+    std::cout << ANSI_BRIGHT_BLUE_BACKGROUND << "\nIT WAS A HIT! " << ANSI_RESET << '\n';
+    std::cout << "Press Any Key to Continue\n";
+    get_keystroke();
 
 }
 
@@ -913,8 +938,8 @@ void handle_player_versus_player_game() {
         case 3:
             attack(curr_player_attacking_board, enemy_player_defending_board, enemy_player_text);
 
-
-
+            
+            
             break; // or return idk
     }
 
@@ -937,7 +962,7 @@ void handle_menu() {
         handle_player_versus_player_game();
         break;
     case Play_Against_Bot:
-        // not quite implemented yet
+        // not implemented yet
         break;
     }
 }
@@ -948,6 +973,5 @@ int main() {
 
     while(true) {
         handle_menu();
-        // check win? -- act no that will prolly happen somewhere else
     }
 }
