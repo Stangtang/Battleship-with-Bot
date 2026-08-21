@@ -21,6 +21,7 @@
 #define HIGHLIGHT_SELECTED_CELL_BACKGROUND_COLOR ANSI_BRIGHT_YELLOW_BACKGROUND
 
 // https://gist.github.com/RabaDabaDoba/145049536f815903c79944599c6f952a
+// https://gist.github.com/JBlond/2fea43a3049b38287e5e9cefc87b2124?permalink_comment_id=4481079#gistcomment-4481079
 
 #define ANSI_BLACK_FOREGROUND   "\e[0;30m"
 #define ANSI_RED_FOREGROUND     "\e[0;31m"
