@@ -751,7 +751,7 @@ void view_your_seas(const Cell_State (*curr_player_defending_board)[BOARD_LENGTH
     }
 }
 
-void print_attacking_board_with_selected_cell(Cell_State (*board)[BOARD_LENGTH], unsigned int selected_row, unsigned int selected_col) {
+void print_attacking_board_with_selected_cell(Cell_State (*board)[BOARD_LENGTH], const int& selected_row, const int& selected_col) {
     for (unsigned int row = 0; row < BOARD_LENGTH; row++) {
         for (unsigned int col = 0; col < BOARD_LENGTH; col++) {
             if (row == selected_row && col == selected_col) {
@@ -777,6 +777,53 @@ void print_attacking_board_with_selected_cell(Cell_State (*board)[BOARD_LENGTH],
 void notify_move_selection_out_of_bounds() {
     std::cout << ANSI_RED_BACKGROUND << "\nCANNOT SELECT THERE: OUT OF BOUNDS" << ANSI_RESET << '\n';
     std::cout << "Press Any Key to Continue\n";
+    get_keystroke();
+}
+
+void print_player_1_winscreen_boards() {
+    std::cout << "PLAYER 1'S ATTACKS\n";
+    print_attacking_board_with_selected_cell(player_1_attacking_board, -1, -1);
+    std::cout << '\n';
+    std::cout << "PLAYER 1'S SHIP LAYOUT\n";
+    print_board(player_1_defending_board);
+}
+
+void print_player_2_winscreen_boards() {
+    std::cout << "PLAYER 2'S ATTACKS\n";
+    print_attacking_board_with_selected_cell(player_2_attacking_board, -1, -1);
+    std::cout << '\n';
+    std::cout << "PLAYER 2'S SHIP LAYOUT\n";
+    print_board(player_2_defending_board);
+}
+
+void print_player_versus_player_winner_text(const std::string& curr_player_text) {
+    std::cout << ANSI_LIGHT_YELLOW_FOREGROUND << to_upper(curr_player_text) << " IS THE WINNER!" << ANSI_RESET << '\n';
+    std::cout << '\n';
+}
+
+void print_player_versus_player_win_screen(const std::string& curr_player_text) {
+    print_player_versus_player_winner_text(curr_player_text);
+
+    if (curr_player_text == "Player 1") {
+        print_player_1_winscreen_boards();
+        std::cout << '\n';
+        std::cout << "Press Any Key to Continue\n";
+        get_keystroke();
+        clear_terminal();
+        print_player_versus_player_winner_text(curr_player_text);
+        print_player_2_winscreen_boards();
+    } else {
+        print_player_2_winscreen_boards();
+        std::cout << '\n';
+        std::cout << "Press Any Key to Continue\n";
+        get_keystroke();
+        clear_terminal();
+        print_player_versus_player_winner_text(curr_player_text);
+        print_player_1_winscreen_boards(); 
+    }
+
+    std::cout << '\n';
+    std::cout << "Press Any Key to Return to Main Menu\n";
     get_keystroke();
 }
 
@@ -893,15 +940,7 @@ void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_
 
     if (num_ships_hit == 5 + 4 + 3 + 3 + 2) {
         clear_terminal();
-        std::cout << ANSI_LIGHT_YELLOW_FOREGROUND << to_upper(curr_player_text) << " IS THE WINNER" << ANSI_RESET << '\n';
-        std::cout << '\n';
-
-        std::cout << curr_player_text << "'s Attacks\n";
-        print_board(curr_player_attacking_board);
-        std::cout << '\n';
-
-        std::cout << "Press Any Key to Return to Main Menu\n";
-        get_keystroke();
+        print_player_versus_player_win_screen(curr_player_text);
 
         std::stack<Menu> new_menu;
         new_menu.push(Menu::Start);
