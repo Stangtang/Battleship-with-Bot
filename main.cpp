@@ -892,8 +892,22 @@ void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_
     }
 
     if (num_ships_hit == 5 + 4 + 3 + 3 + 2) {
-        std::cout << ANSI_LIGHT_YELLOW_FOREGROUND << "IS THE WINNER";
+        clear_terminal();
+        std::cout << ANSI_LIGHT_YELLOW_FOREGROUND << to_upper(curr_player_text) << " IS THE WINNER\n";
+        std::cout << "Press Any Key to Return to Main Menu\n";
+        get_keystroke();
+
+        std::stack<Menu> new_menu;
+        new_menu.push(Menu::Start);
+        menu = new_menu;
+        init_board(player_1_defending_board);
+        init_board(player_2_defending_board);
+        init_board(player_1_attacking_board);
+        init_board(player_2_attacking_board);
+        return;
     }
+
+    attack(curr_player_attacking_board, enemy_player_defending_board, curr_player_text, enemy_player_text);
     
 }
 
@@ -950,12 +964,8 @@ void handle_player_versus_player_game() {
             return;
         case 3:
             attack(curr_player_attacking_board, enemy_player_defending_board, curr_player_text, enemy_player_text);
-
-            
-            
-            break; // or return idk
+            return;
     }
-
 }
 
 void handle_menu() {
