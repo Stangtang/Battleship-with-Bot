@@ -84,7 +84,7 @@ void handle_start() {
     std::cout << "PRESS NUMBER KEY TO MAKE SELECTION\n";
 
     const std::vector<std::string> options = {
-        "Play Against Bot",
+        "Play Against Bot (WIP)",
         "Play Against Another Person"
     };
     print_options(options);
