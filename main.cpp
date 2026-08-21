@@ -780,7 +780,7 @@ void notify_move_selection_out_of_bounds() {
     get_keystroke();
 }
 
-void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_State (*enemy_player_defending_board)[BOARD_LENGTH], const std::string& enemy_player_text) {
+void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_State (*enemy_player_defending_board)[BOARD_LENGTH], const std::string& curr_player_text, const std::string& enemy_player_text) {
     unsigned int selected_row = get_random_number_inclusive(0, BOARD_LENGTH - 1);
     unsigned int selected_col = get_random_number_inclusive(0, BOARD_LENGTH - 1);
 
@@ -882,6 +882,18 @@ void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_
     std::cout << "Press Any Key to Continue\n";
     get_keystroke();
 
+    unsigned int num_ships_hit = 0;
+    for (unsigned int i = 0; i < BOARD_LENGTH; i++) {
+        for (unsigned int j = 0; j < BOARD_LENGTH; j++) {
+            if (curr_player_attacking_board[i][j] == Hit) {
+                num_ships_hit++;
+            }
+        }
+    }
+
+    if (num_ships_hit == 5 + 4 + 3 + 3 + 2) {
+        std::cout << ANSI_LIGHT_YELLOW_FOREGROUND << "IS THE WINNER";
+    }
     
 }
 
@@ -937,7 +949,7 @@ void handle_player_versus_player_game() {
             view_your_seas(curr_player_defending_board, curr_player_text);
             return;
         case 3:
-            attack(curr_player_attacking_board, enemy_player_defending_board, enemy_player_text);
+            attack(curr_player_attacking_board, enemy_player_defending_board, curr_player_text, enemy_player_text);
 
             
             
