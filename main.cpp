@@ -893,7 +893,7 @@ void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_
 
     if (num_ships_hit == 5 + 4 + 3 + 3 + 2) {
         clear_terminal();
-        std::cout << ANSI_LIGHT_YELLOW_FOREGROUND << to_upper(curr_player_text) << " IS THE WINNER\n";
+        std::cout << ANSI_LIGHT_YELLOW_FOREGROUND << to_upper(curr_player_text) << " IS THE WINNER" << ANSI_RESET << '\n';
         std::cout << "Press Any Key to Return to Main Menu\n";
         get_keystroke();
 
