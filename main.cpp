@@ -40,7 +40,7 @@ void clear_terminal() {
     std::cout << ANSI_CLEAR_TERMINAL;
 }
 
-int get_random_number_inclusive(const int& bound_1, const int& bound_2) {
+int get_random_number_inclusive(const int &bound_1, const int &bound_2) {
     const int lower_bound = std::min(bound_1, bound_2);
     const int upper_bound = std::max(bound_1, bound_2);
     std::uniform_int_distribution<int> dist(lower_bound, upper_bound);
@@ -50,10 +50,9 @@ int get_random_number_inclusive(const int& bound_1, const int& bound_2) {
 
 auto to_upper = [](std::string s) {
     std::transform(s.begin(), s.end(), s.begin(),
-        [](unsigned char c) {
-            return std::toupper(c);
-        }
-    );
+                   [](unsigned char c) {
+                       return std::toupper(c);
+                   });
     return s;
 };
 
@@ -65,13 +64,13 @@ bool is_option_selection_input_valid(int key_pressed, std::uint8_t num_options) 
     return false;
 }
 
-void print_options(const std::vector<std::string>& options) {
+void print_options(const std::vector<std::string> &options) {
     for (std::uint8_t i = 0; i < options.size(); i++) {
         std::cout << i + 1 << " | " + options[i] << '\n';
     }
 }
 
-std::uint8_t get_option_selected(const std::vector<std::string>& options) {
+std::uint8_t get_option_selected(const std::vector<std::string> &options) {
     int key_pressed;
     do {
         key_pressed = get_keystroke();
@@ -85,10 +84,10 @@ void handle_start() {
 
     const std::vector<std::string> options = {
         "Play Against Bot (WIP)",
-        "Play Against Another Person"
+        "Play Against Another Person",
     };
     print_options(options);
-    switch(get_option_selected(options)) {
+    switch (get_option_selected(options)) {
     case 1:
         menu.push(Menu::Play_Against_Bot);
         break;
@@ -101,7 +100,7 @@ void handle_start() {
 void print_board(const Cell_State (*board)[BOARD_LENGTH]) {
     for (unsigned int row = 0; row < BOARD_LENGTH; row++) {
         for (unsigned int col = 0; col < BOARD_LENGTH; col++) {
-            switch(board[row][col]) {
+            switch (board[row][col]) {
             case Cell_State::Unmarked:
                 std::cout << '-';
                 break;
@@ -149,15 +148,15 @@ void print_enemy_seas_legend() {
     std::cout << "O : Miss\n";
 }
 
-bool is_index_in_bounds(const int& index) {
+bool is_index_in_bounds(const int &index) {
     return index >= 0 && index < BOARD_LENGTH;
 }
 
-bool is_position_in_bounds(const int& row, const int& col) {
+bool is_position_in_bounds(const int &row, const int &col) {
     return is_index_in_bounds(row) && is_index_in_bounds(col);
 }
 
-bool are_cell_and_neighbors_unmarked(const int& row, const int& col, const Cell_State (*board)[BOARD_LENGTH]) {
+bool are_cell_and_neighbors_unmarked(const int &row, const int &col, const Cell_State (*board)[BOARD_LENGTH]) {
     for (int i = row - 1; i <= row + 1; i++) {
         for (int j = col - 1; j <= col + 1; j++) {
             if (board[i][j] != Cell_State::Unmarked || !is_position_in_bounds(row, col)) {
@@ -168,7 +167,7 @@ bool are_cell_and_neighbors_unmarked(const int& row, const int& col, const Cell_
     return true;
 }
 
-void remove_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH]) { 
+void remove_ship(const Cell_State &ship_type, Cell_State (*board)[BOARD_LENGTH]) {
     for (unsigned int i = 0; i < BOARD_LENGTH; i++) {
         for (unsigned int j = 0; j < BOARD_LENGTH; j++) {
             if (board[i][j] == ship_type) {
@@ -178,15 +177,26 @@ void remove_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
     }
 };
 
-void place_ship_randomly(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH]) {
+void place_ship_randomly(const Cell_State &ship_type, Cell_State (*board)[BOARD_LENGTH]) {
     unsigned int ship_length;
     switch (ship_type) {
-    case Cell_State::Aircraft_Carrier: ship_length = 5; break;
-    case Cell_State::Battleship:       ship_length = 4; break;
-    case Cell_State::Cruiser:          ship_length = 3; break;
-    case Cell_State::Submarine:        ship_length = 3; break;
-    case Cell_State::Destroyer:        ship_length = 2; break;
-    default: return;
+    case Cell_State::Aircraft_Carrier:
+        ship_length = 5;
+        break;
+    case Cell_State::Battleship:
+        ship_length = 4;
+        break;
+    case Cell_State::Cruiser:
+        ship_length = 3;
+        break;
+    case Cell_State::Submarine:
+        ship_length = 3;
+        break;
+    case Cell_State::Destroyer:
+        ship_length = 2;
+        break;
+    default:
+        return;
     }
 
     while (true) { // there should be no case where there is no valid placement for a ship
@@ -201,7 +211,7 @@ void place_ship_randomly(const Cell_State& ship_type, Cell_State (*board)[BOARD_
                     is_placement_valid = false;
                 }
             }
-            
+
             if (!is_placement_valid) {
                 continue;
             }
@@ -209,7 +219,7 @@ void place_ship_randomly(const Cell_State& ship_type, Cell_State (*board)[BOARD_
             for (unsigned int i = 0; i < ship_length; i++) {
                 board[row][col + i] = ship_type;
             }
-            
+
             break;
         } else if (direction == 2) { // vertical
             const unsigned int row = get_random_number_inclusive(0, BOARD_LENGTH - 1 - ship_length + 1);
@@ -235,32 +245,34 @@ void place_ship_randomly(const Cell_State& ship_type, Cell_State (*board)[BOARD_
     }
 }
 
-std::string get_ship_text(const Cell_State& ship_type) {
-    switch(ship_type) {
-        case Cell_State::Aircraft_Carrier:
-            return "Aircraft Carrier";
-        case Cell_State::Battleship:
-            return "Battleship";
-        case Cell_State::Cruiser:
-            return "Cruiser";
-        case Cell_State::Submarine:
-            return "Submarine";
-        case Cell_State::Destroyer:
-            return "Destroyer";
-        default:
-            return "\033[34;43mERROR: NOT A SHIP NAME\033[0m"; // This text should never show
+std::string get_ship_text(const Cell_State &ship_type) {
+    switch (ship_type) {
+    case Cell_State::Aircraft_Carrier:
+        return "Aircraft Carrier";
+    case Cell_State::Battleship:
+        return "Battleship";
+    case Cell_State::Cruiser:
+        return "Cruiser";
+    case Cell_State::Submarine:
+        return "Submarine";
+    case Cell_State::Destroyer:
+        return "Destroyer";
+    default:
+        return "\033[34;43mERROR: NOT A SHIP NAME\033[0m"; // This text should never show
     }
 }
 
-std::string get_player_text(const Player& player) {
-    switch(player) {
-        case Player_1: return "Player 1";
-        case Player_2: return "Player 2";
+std::string get_player_text(const Player &player) {
+    switch (player) {
+    case Player_1:
+        return "Player 1";
+    case Player_2:
+        return "Player 2";
         // add bot case?
     }
 }
 
-void move_ship(const int (&direction)[2], const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH]) {
+void move_ship(const int (&direction)[2], const Cell_State &ship_type, Cell_State (*board)[BOARD_LENGTH]) {
     const int delta_row = direction[0];
     const int delta_col = direction[1];
 
@@ -304,23 +316,34 @@ void move_ship(const int (&direction)[2], const Cell_State& ship_type, Cell_Stat
             }
         }
     }
-    for (const auto& location : ship_cells) {
+    for (const auto &location : ship_cells) {
         board[location.first][location.second] = Cell_State::Unmarked;
     }
-    for (const auto& location : ship_new_cells) {
+    for (const auto &location : ship_new_cells) {
         board[location.first][location.second] = ship_type;
     }
 }
 
-void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH]) {
+void rotate_ship(const Cell_State &ship_type, Cell_State (*board)[BOARD_LENGTH]) {
     unsigned int cells_until_center_of_rotation;
-    switch(ship_type) {
-        case Aircraft_Carrier: cells_until_center_of_rotation = 3; break;
-        case Battleship:       cells_until_center_of_rotation = 2; break;
-        case Cruiser:          cells_until_center_of_rotation = 2; break;
-        case Submarine:        cells_until_center_of_rotation = 2; break;
-        case Destroyer:        cells_until_center_of_rotation = 1; break;
-        default: return;
+    switch (ship_type) {
+    case Aircraft_Carrier:
+        cells_until_center_of_rotation = 3;
+        break;
+    case Battleship:
+        cells_until_center_of_rotation = 2;
+        break;
+    case Cruiser:
+        cells_until_center_of_rotation = 2;
+        break;
+    case Submarine:
+        cells_until_center_of_rotation = 2;
+        break;
+    case Destroyer:
+        cells_until_center_of_rotation = 1;
+        break;
+    default:
+        return;
     }
 
     unsigned int center_row;
@@ -351,19 +374,19 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
                     orientation = 1;
                     break;
                 }
-            }   
+            }
         }
     }
-    
+
     bool can_rotate = true;
-    switch(ship_type) {
+    switch (ship_type) {
     case Aircraft_Carrier:
         if (orientation == 0) {
             if (center_row <= 1 || center_row >= BOARD_LENGTH - 2) {
                 can_rotate = false;
                 break;
             }
-            if (board[center_row - 1][center_col] != Unmarked || 
+            if (board[center_row - 1][center_col] != Unmarked ||
                 board[center_row - 2][center_col] != Unmarked ||
                 board[center_row + 1][center_col] != Unmarked ||
                 board[center_row + 2][center_col] != Unmarked) {
@@ -375,7 +398,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
                 can_rotate = false;
                 break;
             }
-            if (board[center_row][center_col - 1] != Unmarked || 
+            if (board[center_row][center_col - 1] != Unmarked ||
                 board[center_row][center_col - 2] != Unmarked ||
                 board[center_row][center_col + 1] != Unmarked ||
                 board[center_row][center_col + 2] != Unmarked) {
@@ -383,14 +406,14 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
                 break;
             }
         }
-    break;
+        break;
     case Battleship:
         if (orientation == 0) {
             if (center_row <= 0 || center_row >= BOARD_LENGTH - 2) {
                 can_rotate = false;
                 break;
             }
-            if (board[center_row - 1][center_col] != Unmarked || 
+            if (board[center_row - 1][center_col] != Unmarked ||
                 board[center_row + 1][center_col] != Unmarked ||
                 board[center_row + 2][center_col] != Unmarked) {
                 can_rotate = false;
@@ -401,14 +424,14 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
                 can_rotate = false;
                 break;
             }
-            if (board[center_row][center_col - 1] != Unmarked || 
+            if (board[center_row][center_col - 1] != Unmarked ||
                 board[center_row][center_col + 1] != Unmarked ||
                 board[center_row][center_col + 2] != Unmarked) {
                 can_rotate = false;
                 break;
             }
         }
-    break;
+        break;
     case Cruiser:
     case Submarine:
         if (orientation == 0) {
@@ -416,7 +439,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
                 can_rotate = false;
                 break;
             }
-            if (board[center_row - 1][center_col] != Unmarked || 
+            if (board[center_row - 1][center_col] != Unmarked ||
                 board[center_row + 1][center_col] != Unmarked) {
                 can_rotate = false;
                 break;
@@ -426,13 +449,13 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
                 can_rotate = false;
                 break;
             }
-            if (board[center_row][center_col - 1] != Unmarked || 
+            if (board[center_row][center_col - 1] != Unmarked ||
                 board[center_row][center_col + 1] != Unmarked) {
                 can_rotate = false;
                 break;
             }
         }
-    break;
+        break;
     case Destroyer:
         if (orientation == 0) {
             if (center_row == BOARD_LENGTH - 1) {
@@ -453,8 +476,9 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
                 break;
             }
         }
-    break;
-    default: return;
+        break;
+    default:
+        return;
     }
 
     if (!can_rotate) {
@@ -464,7 +488,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
         return;
     }
 
-    switch(ship_type) {
+    switch (ship_type) {
     case Aircraft_Carrier:
         if (orientation == 0) {
             board[center_row][center_col - 1] = Unmarked;
@@ -485,7 +509,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
             board[center_row][center_col + 1] = ship_type;
             board[center_row][center_col + 2] = ship_type;
         }
-    break;
+        break;
     case Battleship:
         if (orientation == 0) {
             board[center_row][center_col - 1] = Unmarked;
@@ -502,7 +526,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
             board[center_row][center_col + 1] = ship_type;
             board[center_row][center_col + 2] = ship_type;
         }
-    break;
+        break;
     case Cruiser:
     case Submarine:
         if (orientation == 0) {
@@ -516,7 +540,7 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
             board[center_row][center_col - 1] = ship_type;
             board[center_row][center_col + 1] = ship_type;
         }
-    break;
+        break;
     case Destroyer:
         if (orientation == 0) {
             board[center_row][center_col + 1] = Unmarked;
@@ -525,12 +549,13 @@ void rotate_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH])
             board[center_row + 1][center_col] = Unmarked;
             board[center_row][center_col + 1] = ship_type;
         }
-    break;
-    default: return;
+        break;
+    default:
+        return;
     }
 }
 
-void place_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH]) {
+void place_ship(const Cell_State &ship_type, Cell_State (*board)[BOARD_LENGTH]) {
     place_ship_randomly(ship_type, board);
 
     const std::string ship_name = get_ship_text(ship_type);
@@ -554,31 +579,32 @@ void place_ship(const Cell_State& ship_type, Cell_State (*board)[BOARD_LENGTH]) 
         print_board(board);
 
         input = get_special_keystroke();
-        switch(input) {
-            case Special_Key::Not_Recognized:
-                continue;
-            case Special_Key::Escape:
-                init_board(board);
-                place_ship_randomly(ship_type, board);
-                break;
-            case Special_Key::Right_Arrow:
-                move_ship({0, 1}, ship_type, board);
-                break;
-            case Special_Key::Left_Arrow:
-                move_ship({0, -1}, ship_type, board);
-                break;
-            case Special_Key::Down_Arrow:
-                move_ship({1, 0}, ship_type, board);
-                break;
-            case Special_Key::Up_Arrow:
-                move_ship({-1, 0}, ship_type, board);
-                break;
-            case Special_Key::R:
-                rotate_ship(ship_type, board);
-                break;
-            default: break;
+        switch (input) {
+        case Special_Key::Not_Recognized:
+            continue;
+        case Special_Key::Escape:
+            init_board(board);
+            place_ship_randomly(ship_type, board);
+            break;
+        case Special_Key::Right_Arrow:
+            move_ship({0, 1}, ship_type, board);
+            break;
+        case Special_Key::Left_Arrow:
+            move_ship({0, -1}, ship_type, board);
+            break;
+        case Special_Key::Down_Arrow:
+            move_ship({1, 0}, ship_type, board);
+            break;
+        case Special_Key::Up_Arrow:
+            move_ship({-1, 0}, ship_type, board);
+            break;
+        case Special_Key::R:
+            rotate_ship(ship_type, board);
+            break;
+        default:
+            break;
         }
-    } while(input != Special_Key::Enter);
+    } while (input != Special_Key::Enter);
 }
 
 bool are_all_ships_placed(const Cell_State (*board)[BOARD_LENGTH]) {
@@ -587,8 +613,7 @@ bool are_all_ships_placed(const Cell_State (*board)[BOARD_LENGTH]) {
         Battleship,
         Cruiser,
         Submarine,
-        Destroyer
-    };
+        Destroyer};
     for (Cell_State ship : ships) {
         bool found = false;
         for (int i = 0; i < BOARD_LENGTH && !found; i++) {
@@ -628,55 +653,55 @@ void handle_play_against_human_ship_placement() {
     print_ship_color_legend();
     std::cout << '\n';
 
-    Cell_State (*curr_player_defending_board)[BOARD_LENGTH];
+    Cell_State(*curr_player_defending_board)[BOARD_LENGTH];
     switch (curr_player) {
-        case Player_1:
-            curr_player_defending_board = player_1_defending_board;
-            break;
-        case Player_2:
-            curr_player_defending_board = player_2_defending_board;
-            break;
+    case Player_1:
+        curr_player_defending_board = player_1_defending_board;
+        break;
+    case Player_2:
+        curr_player_defending_board = player_2_defending_board;
+        break;
     }
 
     print_board(curr_player_defending_board);
 
-    switch(get_option_selected(options)) {
-        case 1:
-            remove_ship(Aircraft_Carrier, curr_player_defending_board);
-            place_ship(Aircraft_Carrier, curr_player_defending_board);
+    switch (get_option_selected(options)) {
+    case 1:
+        remove_ship(Aircraft_Carrier, curr_player_defending_board);
+        place_ship(Aircraft_Carrier, curr_player_defending_board);
+        break;
+    case 2:
+        remove_ship(Battleship, curr_player_defending_board);
+        place_ship(Battleship, curr_player_defending_board);
+        break;
+    case 3:
+        remove_ship(Cruiser, curr_player_defending_board);
+        place_ship(Cruiser, curr_player_defending_board);
+        break;
+    case 4:
+        remove_ship(Submarine, curr_player_defending_board);
+        place_ship(Submarine, curr_player_defending_board);
+        break;
+    case 5:
+        remove_ship(Destroyer, curr_player_defending_board);
+        place_ship(Destroyer, curr_player_defending_board);
+        break;
+    case 6:
+        init_board(curr_player_defending_board);
+        break;
+    case 7:
+        if (!are_all_ships_placed(curr_player_defending_board)) {
+            std::cout << ANSI_RED_BACKGROUND << "\nCANNOT CONFIRM LAYOUT: NOT ALL SHIPS PLACED" << ANSI_RESET << '\n';
+            std::cout << "Press Any Key to Continue\n";
+            get_keystroke();
             break;
-        case 2:
-            remove_ship(Battleship, curr_player_defending_board);
-            place_ship(Battleship, curr_player_defending_board);
-            break;
-        case 3:
-            remove_ship(Cruiser, curr_player_defending_board);
-            place_ship(Cruiser, curr_player_defending_board);
-            break;
-        case 4:
-            remove_ship(Submarine, curr_player_defending_board);
-            place_ship(Submarine, curr_player_defending_board);
-            break;
-        case 5:
-            remove_ship(Destroyer, curr_player_defending_board);
-            place_ship(Destroyer, curr_player_defending_board);
-            break;
-        case 6:
-            init_board(curr_player_defending_board);
-            break;
-        case 7:
-            if (!are_all_ships_placed(curr_player_defending_board)) {
-                std::cout << ANSI_RED_BACKGROUND << "\nCANNOT CONFIRM LAYOUT: NOT ALL SHIPS PLACED" << ANSI_RESET << '\n';
-                std::cout << "Press Any Key to Continue\n";
-                get_keystroke();
-                break;
-            }
-            menu.pop();
-            break;
-        case 8:
-            init_board(curr_player_defending_board);
-            menu.pop();
-            break;
+        }
+        menu.pop();
+        break;
+    case 8:
+        init_board(curr_player_defending_board);
+        menu.pop();
+        break;
     }
 }
 
@@ -701,28 +726,40 @@ Player get_first_player() {
         "Player 2",
     };
     print_options(options);
-    switch(get_option_selected(options)) {
-        case 1: return Player_1;
-        case 2: return Player_2;
+    switch (get_option_selected(options)) {
+    case 1:
+        return Player_1;
+    case 2:
+        return Player_2;
     }
 }
 
-void print_attacking_board_with_selected_cell(const Cell_State (*attacking_board)[BOARD_LENGTH], const Cell_State (*defending_board)[BOARD_LENGTH], const int& selected_row, const int& selected_col, bool print_legend = false) {
+void print_attacking_board_with_selected_cell(const Cell_State (*attacking_board)[BOARD_LENGTH], const Cell_State (*defending_board)[BOARD_LENGTH], const int &selected_row, const int &selected_col, bool print_legend = false) {
     unsigned int aircraft_carrier_cells_hit = 0;
     unsigned int battleship_cells_hit = 0;
     unsigned int cruiser_cells_hit = 0;
     unsigned int submarine_cells_hit = 0;
     unsigned int destroyer_cells_hit = 0;
-    
+
     for (unsigned int row = 0; row < BOARD_LENGTH; row++) {
         for (unsigned int col = 0; col < BOARD_LENGTH; col++) {
             if (attacking_board[row][col] == Hit) {
-                switch(defending_board[row][col]) {
-                    case Aircraft_Carrier: aircraft_carrier_cells_hit++; break;
-                    case Battleship: battleship_cells_hit++; break;
-                    case Cruiser: cruiser_cells_hit++; break;
-                    case Submarine: submarine_cells_hit++; break;
-                    case Destroyer: destroyer_cells_hit++; break;
+                switch (defending_board[row][col]) {
+                case Aircraft_Carrier:
+                    aircraft_carrier_cells_hit++;
+                    break;
+                case Battleship:
+                    battleship_cells_hit++;
+                    break;
+                case Cruiser:
+                    cruiser_cells_hit++;
+                    break;
+                case Submarine:
+                    submarine_cells_hit++;
+                    break;
+                case Destroyer:
+                    destroyer_cells_hit++;
+                    break;
                 }
             }
         }
@@ -752,7 +789,7 @@ void print_attacking_board_with_selected_cell(const Cell_State (*attacking_board
             if (row == selected_row && col == selected_col) {
                 std::cout << HIGHLIGHT_SELECTED_CELL_BACKGROUND_COLOR;
             }
-            switch(attacking_board[row][col]) {
+            switch (attacking_board[row][col]) {
             case Cell_State::Unmarked:
                 std::cout << '-';
                 break;
@@ -787,12 +824,12 @@ void print_attacking_board_with_selected_cell(const Cell_State (*attacking_board
     }
 }
 
-void view_enemy_seas(const Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_State (*enemy_player_defending_board)[BOARD_LENGTH], const std::string& enemy_player_text) {
+void view_enemy_seas(const Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_State (*enemy_player_defending_board)[BOARD_LENGTH], const std::string &enemy_player_text) {
     clear_terminal();
 
     std::cout << "VIEWING ENEMY (" << to_upper(enemy_player_text) << "'S) SEAS\n";
     std::cout << '\n';
-    
+
     const std::vector<std::string> options = {
         "Back",
     };
@@ -805,7 +842,8 @@ void view_enemy_seas(const Cell_State (*curr_player_attacking_board)[BOARD_LENGT
     print_attacking_board_with_selected_cell(curr_player_attacking_board, enemy_player_defending_board, -1, -1);
 
     switch (get_option_selected(options)) {
-    case 1: return;
+    case 1:
+        return;
     }
 }
 
@@ -814,7 +852,7 @@ void view_your_seas(const Cell_State (*curr_player_defending_board)[BOARD_LENGTH
 
     std::cout << "VIEWING YOUR (" << to_upper(curr_player_text) << "'S) SEAS\n";
     std::cout << '\n';
-    
+
     const std::vector<std::string> options = {
         "Back",
     };
@@ -827,7 +865,8 @@ void view_your_seas(const Cell_State (*curr_player_defending_board)[BOARD_LENGTH
     print_board(curr_player_defending_board);
 
     switch (get_option_selected(options)) {
-    case 1: return;
+    case 1:
+        return;
     }
 }
 
@@ -853,12 +892,12 @@ void print_player_2_winscreen_boards() {
     print_board(player_2_defending_board);
 }
 
-void print_player_versus_player_winner_text(const std::string& curr_player_text) {
+void print_player_versus_player_winner_text(const std::string &curr_player_text) {
     std::cout << ANSI_LIGHT_YELLOW_FOREGROUND << to_upper(curr_player_text) << " IS THE WINNER!" << ANSI_RESET << '\n';
     std::cout << '\n';
 }
 
-void print_player_versus_player_win_screen(const std::string& curr_player_text) {
+void print_player_versus_player_win_screen(const std::string &curr_player_text) {
     print_player_versus_player_winner_text(curr_player_text);
 
     if (curr_player_text == "Player 1") {
@@ -876,7 +915,7 @@ void print_player_versus_player_win_screen(const std::string& curr_player_text) 
         get_keystroke();
         clear_terminal();
         print_player_versus_player_winner_text(curr_player_text);
-        print_player_1_winscreen_boards(); 
+        print_player_1_winscreen_boards();
     }
 
     std::cout << '\n';
@@ -884,7 +923,7 @@ void print_player_versus_player_win_screen(const std::string& curr_player_text) 
     get_keystroke();
 }
 
-void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_State (*enemy_player_defending_board)[BOARD_LENGTH], const std::string& curr_player_text, const std::string& enemy_player_text) {
+void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_State (*enemy_player_defending_board)[BOARD_LENGTH], const std::string &curr_player_text, const std::string &enemy_player_text) {
     unsigned int selected_row = get_random_number_inclusive(0, BOARD_LENGTH - 1);
     unsigned int selected_col = get_random_number_inclusive(0, BOARD_LENGTH - 1);
 
@@ -906,61 +945,61 @@ void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_
         print_attacking_board_with_selected_cell(curr_player_attacking_board, enemy_player_defending_board, selected_row, selected_col, true);
 
         input = get_special_keystroke();
-        switch(input) {
-            case Not_Recognized: 
-                continue;
-            case Escape:
-                return;
-            case Right_Arrow:
-                if (is_index_in_bounds(selected_col + 1)) {
-                    selected_col++;
-                    break;
-                }
-                notify_move_selection_out_of_bounds();
+        switch (input) {
+        case Not_Recognized:
+            continue;
+        case Escape:
+            return;
+        case Right_Arrow:
+            if (is_index_in_bounds(selected_col + 1)) {
+                selected_col++;
                 break;
-            case Left_Arrow:
-                if (is_index_in_bounds(selected_col - 1)) {
-                    selected_col--;
-                    break;
-                }
-                notify_move_selection_out_of_bounds();
+            }
+            notify_move_selection_out_of_bounds();
+            break;
+        case Left_Arrow:
+            if (is_index_in_bounds(selected_col - 1)) {
+                selected_col--;
                 break;
-            case Down_Arrow:
-                if (is_index_in_bounds(selected_row + 1)) {
-                    selected_row++;
-                    break;
-                }
-                notify_move_selection_out_of_bounds();
+            }
+            notify_move_selection_out_of_bounds();
+            break;
+        case Down_Arrow:
+            if (is_index_in_bounds(selected_row + 1)) {
+                selected_row++;
                 break;
-            case Up_Arrow:
-                if (is_index_in_bounds(selected_row - 1)) {
-                    selected_row--;
-                    break;
-                }
-                notify_move_selection_out_of_bounds();
+            }
+            notify_move_selection_out_of_bounds();
+            break;
+        case Up_Arrow:
+            if (is_index_in_bounds(selected_row - 1)) {
+                selected_row--;
                 break;
-            case Enter:
-                if (curr_player_attacking_board[selected_row][selected_col] != Unmarked) {
-                    std::string cell_state_text;
-                    if (curr_player_attacking_board[selected_row][selected_col] == Hit) {
-                        cell_state_text = "HIT";
-                    } else if (curr_player_attacking_board[selected_row][selected_col] == Miss) {
-                        cell_state_text = "MISS";
-                    }
-                    std::cout << ANSI_RED_BACKGROUND << "\nCANNOT ATTACK THERE: ALREADY A " << cell_state_text << ANSI_RESET << '\n';
-                    std::cout << "Press Any Key to Continue\n";
-                    get_keystroke();
-                    break;
+            }
+            notify_move_selection_out_of_bounds();
+            break;
+        case Enter:
+            if (curr_player_attacking_board[selected_row][selected_col] != Unmarked) {
+                std::string cell_state_text;
+                if (curr_player_attacking_board[selected_row][selected_col] == Hit) {
+                    cell_state_text = "HIT";
+                } else if (curr_player_attacking_board[selected_row][selected_col] == Miss) {
+                    cell_state_text = "MISS";
                 }
+                std::cout << ANSI_RED_BACKGROUND << "\nCANNOT ATTACK THERE: ALREADY A " << cell_state_text << ANSI_RESET << '\n';
+                std::cout << "Press Any Key to Continue\n";
+                get_keystroke();
+                break;
+            }
 
-                cell_selected = true;
-                break;
+            cell_selected = true;
+            break;
         }
-    } while(!cell_selected);
+    } while (!cell_selected);
 
     if (enemy_player_defending_board[selected_row][selected_col] == Unmarked) {
         curr_player_attacking_board[selected_row][selected_col] = Miss;
-        
+
         clear_terminal();
         std::cout << "ENEMY (" << to_upper(enemy_player_text) << "'S) SEAS\n";
         print_attacking_board_with_selected_cell(curr_player_attacking_board, enemy_player_defending_board, selected_row, selected_col);
@@ -981,7 +1020,7 @@ void attack(Cell_State (*curr_player_attacking_board)[BOARD_LENGTH], const Cell_
 
     clear_terminal();
     std::cout << "ENEMY (" << to_upper(enemy_player_text) << "'S) SEAS\n";
-    print_attacking_board_with_selected_cell(curr_player_attacking_board, enemy_player_defending_board, selected_row , selected_col);
+    print_attacking_board_with_selected_cell(curr_player_attacking_board, enemy_player_defending_board, selected_row, selected_col);
     std::cout << ANSI_LIGHT_GREEN_FOREGROUND << "\nIT WAS A HIT!" << ANSI_RESET << '\n';
     std::cout << "Press Any Key to Continue\n";
     get_keystroke();
@@ -1020,22 +1059,22 @@ void handle_player_versus_player_game() {
 
     const std::string curr_player_text = get_player_text(curr_player);
     std::string enemy_player_text;
-    Cell_State (*curr_player_defending_board)[BOARD_LENGTH];
-    Cell_State (*curr_player_attacking_board)[BOARD_LENGTH];
-    Cell_State (*enemy_player_defending_board)[BOARD_LENGTH];
+    Cell_State(*curr_player_defending_board)[BOARD_LENGTH];
+    Cell_State(*curr_player_attacking_board)[BOARD_LENGTH];
+    Cell_State(*enemy_player_defending_board)[BOARD_LENGTH];
     switch (curr_player) {
-        case Player_1:
-            curr_player_defending_board = player_1_defending_board;
-            curr_player_attacking_board = player_1_attacking_board;
-            enemy_player_defending_board = player_2_defending_board;
-            enemy_player_text = get_player_text(Player_2);
-            break;
-        case Player_2:
-            curr_player_defending_board = player_2_defending_board;
-            curr_player_attacking_board = player_2_attacking_board;
-            enemy_player_defending_board = player_1_defending_board;
-            enemy_player_text = get_player_text(Player_1);
-            break;
+    case Player_1:
+        curr_player_defending_board = player_1_defending_board;
+        curr_player_attacking_board = player_1_attacking_board;
+        enemy_player_defending_board = player_2_defending_board;
+        enemy_player_text = get_player_text(Player_2);
+        break;
+    case Player_2:
+        curr_player_defending_board = player_2_defending_board;
+        curr_player_attacking_board = player_2_attacking_board;
+        enemy_player_defending_board = player_1_defending_board;
+        enemy_player_text = get_player_text(Player_1);
+        break;
     }
 
     std::cout << to_upper(curr_player_text) << "'S TURN\n";
@@ -1052,27 +1091,27 @@ void handle_player_versus_player_game() {
     std::cout << "ENEMY SEAS\n";
     print_attacking_board_with_selected_cell(curr_player_attacking_board, enemy_player_defending_board, -1, -1);
     std::cout << '\n';
-    
+
     std::cout << "YOUR SEAS\n";
     print_board(curr_player_defending_board);
 
-    switch(get_option_selected(options)) {
-        case 1:
-            view_enemy_seas(curr_player_attacking_board, enemy_player_defending_board, enemy_player_text);
-            return;
-        case 2:
-            view_your_seas(curr_player_defending_board, curr_player_text);
-            return;
-        case 3:
-            attack(curr_player_attacking_board, enemy_player_defending_board, curr_player_text, enemy_player_text);
-            return;
+    switch (get_option_selected(options)) {
+    case 1:
+        view_enemy_seas(curr_player_attacking_board, enemy_player_defending_board, enemy_player_text);
+        return;
+    case 2:
+        view_your_seas(curr_player_defending_board, curr_player_text);
+        return;
+    case 3:
+        attack(curr_player_attacking_board, enemy_player_defending_board, curr_player_text, enemy_player_text);
+        return;
     }
 }
 
 void handle_menu() {
     clear_terminal();
 
-    switch(menu.top()) {
+    switch (menu.top()) {
     case Start:
         handle_start();
         break;
@@ -1095,7 +1134,7 @@ int main() {
     menu.push(Menu::Start);
     clear_terminal();
 
-    while(true) {
+    while (true) {
         handle_menu();
     }
 }
